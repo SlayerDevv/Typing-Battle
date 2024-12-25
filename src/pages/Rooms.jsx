@@ -21,6 +21,7 @@ export default function RoomsPage() {
   const [currentRoom, setCurrentRoom] = useState(null);
   const [isRoomFull, setIsRoomFull] = useState(false);
   const [error, setError] = useState(null);
+  const [Rooms, setRooms] = useState(null)
 
   useEffect(() => {
     const fetchRooms = async () => {
@@ -101,13 +102,11 @@ export default function RoomsPage() {
             <Input
               placeholder='Player displayname'
               className='bg-input'
-              value={playerDisplayName}
               onChange={(e) => {setPlayerDisplayName(e.target.value), setError(null)}}
             />
             <Input
               placeholder='Room name'
               className='bg-input'
-              value={roomName}
               onChange={(e) => {setRoomName(e.target.value), setError(null)}}
             />
             <Button

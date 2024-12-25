@@ -4,9 +4,8 @@ import { ChevronRight } from "lucide-react";
 
 export default function Home() {
  return(
-  <div>
-    home page
-    <RoomsPage/>
+  <div className="">
+    <RoomsPage />
    
   </div>
  )

@@ -2,6 +2,12 @@
 
 import { useEffect, useState } from 'react';
 import { io } from 'socket.io-client';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../components/ui/card';
+import { Button } from '../components/ui/button';
+import { Input } from '../components/ui/input';
+import { Alert, AlertDescription, AlertTitle } from '../components/ui/alert';
+import {handleCreateRoomAction, handleJoinRoomAction} from '@/lib/actions'
+import {createRoomSchema, joinRoomSchema} from '@/lib/validation'
 // import { v4 as uuidv4 } from 'uuid'; 
 
 const socket = io('http://localhost:4000', {
@@ -11,9 +17,12 @@ const socket = io('http://localhost:4000', {
 
 export default function RoomsPage() {
   const [playerId, setPlayerId] = useState(null);
+  const [playerDisplayName, setPlayerDisplayName] = useState(""); // For player display name input
+  const [roomName, setRoomName] = useState(''); // For room name input
   const [currentRoom, setCurrentRoom] = useState(null);
   const [messages, setMessages] = useState([]); // For logs/messages
   const [isRoomFull, setIsRoomFull] = useState(false);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     // Listen for events from the server
@@ -55,47 +64,97 @@ export default function RoomsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex flex-col items-center py-10">
-      <h1 className="text-3xl font-bold mb-6">Choose a Room</h1>
-
-      <div className="grid grid-cols-2 gap-6 mb-8">
-        <button
-          className="px-8 py-4 bg-blue-500 text-white rounded-lg shadow hover:bg-blue-700"
-          onClick={() => joinRoom('room1')}
-          disabled={isRoomFull}
-        >
-          Join Room 1
-        </button>
-        <button
-          className="px-8 py-4 bg-green-500 text-white rounded-lg shadow hover:bg-green-700"
-          onClick={() => joinRoom('room2')}
-          disabled={isRoomFull}
-        >
-          Join Room 2
-        </button>
-      </div>
-
-      <div className="w-3/4 bg-white p-6 rounded-lg shadow">
-        <h2 className="text-2xl font-bold mb-4">Messages</h2>
-        <div className="h-64 overflow-y-auto bg-gray-50 p-4 rounded border">
-          {messages.length > 0 ? (
-            messages.map((msg, index) => (
-              <p key={index} className="text-sm text-gray-800">
-                {msg}
-              </p>
-            ))
-          ) : (
-            <p className="text-gray-500">No messages yet...</p>
-          )}
-        </div>
-      </div>
-
-      {currentRoom && (
-        <p className="text-lg mt-4 text-gray-700">
-          You are in <span className="font-bold">{currentRoom}</span> as{' '}
-          <span className="font-bold">{playerId}</span>.
-        </p>
-      )}
+    <div className='min-h-screen flex items-center justify-center bg-[url("/bg.jpg")] bg-cover bg-center'>
+    <div className='flex gap-16'>
+      {/* Create Room Card */}
+      <Card className='w-full h-auto max-h-[500px] bg-purple-400 px-7 rounded-md bg-clip-padding backdrop-filter backdrop-blur-md bg-opacity-20 border border-gray-100'>
+        <CardHeader>
+          <CardTitle className='text-white text-xl'>Create Room</CardTitle>
+        </CardHeader>
+        <CardContent className='overflow-auto'>
+          <div className='space-y-[14px]'>
+               {error?.type === "CREATE" && error?.error.details[0].message ? ( <Alert className='bg-red-900 rounded-md bg-clip-padding backdrop-filter backdrop-blur-lg bg-opacity-40 border border-gray-100 text-red-400'>
+                <AlertTitle>Oopsie!!</AlertTitle>
+                <AlertDescription>{error?.error.details[0].message}</AlertDescription>
+              </Alert>) : ""}
+            <Input
+              placeholder='Player displayname'
+              className='bg-input'
+              value={playerDisplayName}
+              onChange={(e) => {setPlayerDisplayName(e.target.value), setError(null)}}
+            />
+            <Input
+              placeholder='Room name'
+              className='bg-input'
+              value={roomName}
+              onChange={(e) => {setRoomName(e.target.value), setError(null)}}
+            />
+            <Button
+              className='w-full bg-accent text-black hover:text-accent text-lg'
+              onClick={async () => {
+                const validationError = await handleCreateRoomAction({
+                  createRoomSchema,
+                  playerDisplayName,
+                  RoomName: roomName,
+                });
+                if (validationError.error && validationError.type === "CREATE") {
+                  setError(validationError);
+                } else {
+                  setError(null);
+                }
+              }}
+            >
+              Create Room
+            </Button>
+          </div>
+        </CardContent>
+        <CardFooter></CardFooter>
+      </Card>
+  
+      {/* Join Room Card */}
+      <Card className='w-full h-auto max-h-[500px] bg-purple-400 px-7 rounded-md bg-clip-padding backdrop-filter backdrop-blur-md bg-opacity-20 border border-gray-100'>
+        <CardHeader>
+          <CardTitle className='text-white text-xl'>Join Room</CardTitle>
+        </CardHeader>
+        <CardContent className='overflow-auto'>
+          <div className='space-y-[14px]'>
+          {error?.type === "JOIN" && error?.error.details[0].message ? ( <Alert className='bg-red-900 rounded-md bg-clip-padding backdrop-filter backdrop-blur-lg bg-opacity-40 border border-gray-100 text-red-400'>
+                <AlertTitle>Oopsie!!</AlertTitle>
+                <AlertDescription>{error?.error.details[0].message}</AlertDescription>
+              </Alert>) : ""}
+            <Input
+              placeholder='Player displayname'
+              className='bg-input'
+              onChange={(e) => {setPlayerDisplayName(e.target.value), setError(null)}}
+            />
+            <Input
+              placeholder='Room ID / Room name'
+              className='bg-input'
+              onChange={(e) => {setRoomName(e.target.value), setError(null)}}
+            />
+            <Button
+              className='w-full bg-accent text-black hover:text-accent text-lg'
+              onClick={async () => {
+                const validationError = await handleJoinRoomAction({
+                  joinRoomSchema,
+                  playerDisplayName,
+                  RoomId: roomName,
+                });
+                if (validationError.error && validationError.type === "JOIN") {
+                  setError(validationError);
+                } else {
+                  setError(null);
+                }
+              }}
+            >
+              Join Room
+            </Button>
+          </div>
+        </CardContent>
+        <CardFooter></CardFooter>
+      </Card>
     </div>
+  </div>
+  
   );
 }

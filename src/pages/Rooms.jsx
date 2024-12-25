@@ -10,9 +10,8 @@ import {handleCreateRoomAction, handleJoinRoomAction} from '@/lib/actions'
 import {createRoomSchema, joinRoomSchema} from '@/lib/validation'
 // import { v4 as uuidv4 } from 'uuid'; 
 
-const socket = io('http://localhost:4000', {
- 
-  transports: ['websocket'],
+const socket = io("http://localhost:4000", {
+  transports: ["websocket"],
 });
 
 export default function RoomsPage() {
@@ -20,47 +19,69 @@ export default function RoomsPage() {
   const [playerDisplayName, setPlayerDisplayName] = useState(""); // For player display name input
   const [roomName, setRoomName] = useState(''); // For room name input
   const [currentRoom, setCurrentRoom] = useState(null);
-  const [messages, setMessages] = useState([]); // For logs/messages
   const [isRoomFull, setIsRoomFull] = useState(false);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    // Listen for events from the server
-    socket.on('roomJoined', ({ roomId, playerId }) => {
-      setPlayerId(playerId);
+    const fetchRooms = async () => {
+      const response = await fetch("/rooms.json");
+      const data = await response.json();
+      setRooms(data);
+    };
+
+    fetchRooms();
+
+    socket.on("roomJoined", ({ roomId }) => {
       setCurrentRoom(roomId);
-      setMessages((prev) => [...prev, `Joined room ${roomId} as player ${playerId}`]);
       setIsRoomFull(false);
+      showToast(`Joined room ${roomId}`, "success");
     });
 
-    socket.on('roomFull', ({ message }) => {
-      setMessages((prev) => [...prev, message]);
-      setIsRoomFull(true);
+    socket.on("roomFull", ({ message, roomId }) => {
+      if (currentRoom !== roomId) {
+        setIsRoomFull(true); // Only set room full if it's not the current room
+        showToast(message, "error");
+      }
     });
 
-    socket.on('playerJoined', ({ playerId }) => {
-      setMessages((prev) => [...prev, `Player ${playerId} joined the room`]);
+    socket.on("playerJoined", ({ playerId }) => {
+      showToast(`Player ${playerId} joined the room`, "info");
     });
 
-    socket.on('playerDisconnected', ({ playerId }) => {
-      setMessages((prev) => [...prev, `Player ${playerId} disconnected`]);
+    socket.on("playerDisconnected", ({ playerId }) => {
+      showToast(`Player ${playerId} disconnected`, "warning");
     });
 
     return () => {
-      socket.off('roomJoined');
-      socket.off('roomFull');
-      socket.off('playerJoined');
-      socket.off('playerDisconnected');
+      socket.off("roomJoined");
+      socket.off("roomFull");
+      socket.off("playerJoined");
+      socket.off("playerDisconnected");
     };
-  }, []);
+  }, [currentRoom]); // Add currentRoom as a dependency to prevent unnecessary re-renders
+
+  const showToast = (message, type) => {
+    toast({
+      title: message,
+      description: type === "success" ? "success!" : null,
+      variant: type,
+    });
+  };
 
   const joinRoom = (roomId) => {
     if (currentRoom === roomId) {
-      setMessages((prev) => [...prev, `Already in room ${roomId}`]);
+      showToast(`Already in room ${roomId}`, "info");
       return;
     }
-    socket.emit('joinRoom', roomId);
-    setCurrentRoom(roomId);
+
+    // Check if room is full
+    if (isRoomFull && currentRoom !== roomId) {
+      showToast("This room is full, try another one.", "error");
+      return;
+    }
+
+    socket.emit("joinRoom", roomId);
+   
   };
 
   return (

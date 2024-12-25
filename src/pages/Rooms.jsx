@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { io } from 'socket.io-client';
-import { v4 as uuidv4 } from 'uuid'; // For generating playerId on client-side if needed
+// import { v4 as uuidv4 } from 'uuid'; 
 
 const socket = io('http://localhost:4000', {
  

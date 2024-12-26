@@ -8,13 +8,16 @@ import { Input } from '../components/ui/input';
 import { Alert, AlertDescription, AlertTitle } from '../components/ui/alert';
 import {handleCreateRoomAction, handleJoinRoomAction} from '@/lib/actions'
 import {createRoomSchema, joinRoomSchema} from '@/lib/validation'
-// import { v4 as uuidv4 } from 'uuid'; 
+import { useRouter } from 'next/navigation'
+import { toast } from '@/hooks/use-toast';
+import { v4 as uuidv4 } from 'uuid'
 
 const socket = io("http://localhost:4000", {
   transports: ["websocket"],
 });
 
 export default function RoomsPage() {
+  const router = useRouter()
   const [playerId, setPlayerId] = useState(null);
   const [playerDisplayName, setPlayerDisplayName] = useState(""); // For player display name input
   const [roomName, setRoomName] = useState(''); // For room name input
@@ -53,13 +56,28 @@ export default function RoomsPage() {
       showToast(`Player ${playerId} disconnected`, "warning");
     });
 
+    socket.on("roomCreated", ({ roomId, playerId, playerName }) => {
+      router.push(`/TypingRoom?roomId=${roomId}&playerId=${playerId}&playerName=${playerName}`)
+    });
+
+    socket.on("playerJoined", ({ roomId, playerId, playerName }) => {
+      router.push(`/TypingRoom?roomId=${roomId}&playerId=${playerId}&playerName=${playerName}`)
+    });
+
+    socket.on("roomError", ({ message }) => {
+      setError({ error: { details: [{ message }] }, type: "JOIN" })
+    });
+
     return () => {
       socket.off("roomJoined");
       socket.off("roomFull");
       socket.off("playerJoined");
       socket.off("playerDisconnected");
+      socket.off("roomCreated");
+      socket.off("playerJoined");
+      socket.off("roomError");
     };
-  }, [currentRoom]); // Add currentRoom as a dependency to prevent unnecessary re-renders
+  }, [router]);
 
   const showToast = (message, type) => {
     toast({
@@ -69,20 +87,42 @@ export default function RoomsPage() {
     });
   };
 
-  const joinRoom = (roomId) => {
-    if (currentRoom === roomId) {
-      showToast(`Already in room ${roomId}`, "info");
-      return;
-    }
+  const handleCreateRoom = async () => {
+    const validationResult = await handleCreateRoomAction({
+      createRoomSchema,
+      playerDisplayName,
+      RoomName: roomName,
+    });
 
-    // Check if room is full
-    if (isRoomFull && currentRoom !== roomId) {
-      showToast("This room is full, try another one.", "error");
-      return;
+    if (validationResult.error) {
+      setError(validationResult);
+    } else {
+      const { playerId, playerName, roomName: validatedRoomName } = validationResult.data;
+      socket.emit("createRoom", {
+        roomName: validatedRoomName,
+        playerName,
+        playerId
+      });
     }
+  };
 
-    socket.emit("joinRoom", roomId);
-   
+  const handleJoinRoom = async () => {
+    const validationResult = await handleJoinRoomAction({
+      joinRoomSchema,
+      playerDisplayName,
+      RoomId: roomName,
+    });
+
+    if (validationResult.error) {
+      setError(validationResult);
+    } else {
+      const { playerId, playerName, roomName: validatedRoomName } = validationResult.data;
+      socket.emit("joinRoom", {
+        roomName: validatedRoomName,
+        playerName,
+        playerId
+      });
+    }
   };
 
   return (
@@ -111,18 +151,7 @@ export default function RoomsPage() {
             />
             <Button
               className='w-full bg-accent text-black hover:text-accent text-lg'
-              onClick={async () => {
-                const validationError = await handleCreateRoomAction({
-                  createRoomSchema,
-                  playerDisplayName,
-                  RoomName: roomName,
-                });
-                if (validationError.error && validationError.type === "CREATE") {
-                  setError(validationError);
-                } else {
-                  setError(null);
-                }
-              }}
+              onClick={handleCreateRoom}
             >
               Create Room
             </Button>
@@ -154,18 +183,7 @@ export default function RoomsPage() {
             />
             <Button
               className='w-full bg-accent text-black hover:text-accent text-lg'
-              onClick={async () => {
-                const validationError = await handleJoinRoomAction({
-                  joinRoomSchema,
-                  playerDisplayName,
-                  RoomId: roomName,
-                });
-                if (validationError.error && validationError.type === "JOIN") {
-                  setError(validationError);
-                } else {
-                  setError(null);
-                }
-              }}
+              onClick={handleJoinRoom}
             >
               Join Room
             </Button>

@@ -8,12 +8,14 @@ export const initializeSocket = (server) => {
   io = new Server(server, {
     transports: ['websocket'],
     cors: {
-      origin: '*', // Adjust origin in production to your specific frontend URL
+      origin: 'http://localhost:3000', // Adjust origin in production to your specific frontend URL
       methods: ['GET', 'POST'],
       allowedHeaders: ['Content-Type'],
       credentials: true,
     },
   });
+
+  const rooms = new Map();
 
   // Handle client connections
   io.on('connection', (socket) => {
@@ -23,28 +25,68 @@ export const initializeSocket = (server) => {
     const playerId = uuidv4();
     console.log(`Generated playerId for socket ${socket.id}: ${playerId}`);
 
-    // Handle room creation or joining
-    socket.on('joinRoom', (roomId) => {
-      const room = io.sockets.adapter.rooms.get(roomId);
+    // Handle room data requests
+    socket.on('getRoomData', ({ roomId }) => {
+      const roomData = rooms.get(roomId);
+      if (roomData) {
+        socket.emit('roomData', roomData);
+      }
+    });
 
-      // Check if the room already exists and has 2 players
-      if (room && room.size >= 2) {
-        socket.emit('roomFull', { message: 'Room is full. Please join another room.' });
-        console.log(`User ${socket.id} attempted to join full room ${roomId}`);
+    socket.on("createRoom", ({ roomName, playerName, playerId }) => {
+      const roomData = {
+        id: roomName,
+        players: [{
+          id: playerId,
+          name: playerName,
+          isHost: true
+        }],
+        status: "waiting"
+      };
+      
+      rooms.set(roomName, roomData);
+      socket.join(roomName);
+      
+      io.to(roomName).emit("roomCreated", {
+        roomId: roomName,
+        playerId: playerId,
+        playerName: playerName
+      });
+
+      // Emit room data to all players in the room
+      io.to(roomName).emit('roomData', roomData);
+    });
+
+    socket.on("joinRoom", ({ roomName, playerName, playerId }) => {
+      const roomData = rooms.get(roomName);
+      
+      if (!roomData) {
+        socket.emit("roomError", { message: "Room not found" });
         return;
       }
 
-      // Join the room
-      socket.join(roomId);
-      console.log(`User ${playerId} joined room ${roomId}`);
+      if (roomData.players.length >= 2) {
+        socket.emit("roomError", { message: "Room is full" });
+        return;
+      }
 
-      // Notify others in the room
-      socket.to(roomId).emit('playerJoined', {
-        playerId,
+      roomData.players.push({
+        id: playerId,
+        name: playerName,
+        isHost: false
       });
 
-      // Notify the player that they joined successfully
-      socket.emit('roomJoined', { roomId, playerId });
+      socket.join(roomName);
+      
+      io.to(roomName).emit("playerJoined", {
+        roomId: roomName,
+        playerId: playerId,
+        playerName: playerName,
+        players: roomData.players
+      });
+
+      // Emit updated room data to all players in the room
+      io.to(roomName).emit('roomData', roomData);
     });
 
     // Handle progress updates

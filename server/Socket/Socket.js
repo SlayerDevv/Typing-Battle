@@ -39,6 +39,10 @@ export const initializeSocket = (server) => {
         socket.emit("roomError", { message: "Room already exists" });
         return;
       }
+      if (rooms.has(playerId)){
+        socket.emit("roomError", { message: "You already have room running" });
+        return;
+      }
 
       const roomData = {
         id: roomName,
@@ -47,6 +51,7 @@ export const initializeSocket = (server) => {
           name: playerName,
           isHost: true
         }],
+        ready: [],
         status: "waiting"
       };
       
@@ -99,6 +104,17 @@ export const initializeSocket = (server) => {
       // Emit updated room data to all players in the room
       io.to(roomName).emit('roomData', roomData);
     });
+
+      socket.on("playerReady", ({ playerId, roomName}) => {
+        const roomData = rooms.get(roomName);
+        const player = roomData.players.find(p => p.id === playerId);
+        if (player){
+          if (!roomData.ready.includes(playerId)){
+            roomData.ready.push(playerId);
+            
+          }
+        }
+      })
 
     // Handle progress updates
     socket.on('updateProgress', (data) => {

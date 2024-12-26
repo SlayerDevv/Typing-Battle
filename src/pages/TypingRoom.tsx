@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { io } from 'socket.io-client'
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card'
+import { BadgeCheck } from 'lucide-react'
 import '../app/globals.css'
 import TypingCmp from '../components/TypingCmp'
 import OpponentStats from '../components/OpponentStats'
@@ -26,6 +27,7 @@ interface RoomData {
 export default function TypingRoom() {
   const searchParams = useSearchParams()
   const [roomData, setRoomData] = useState<RoomData | null>(null)
+  const [isReady, setIsReady] = useState<Boolean>(false);
   const [opponentStats, setOpponentStats] = useState<{
     playerName: string;
     wpm: number;
@@ -82,6 +84,11 @@ export default function TypingRoom() {
         }))
       }
     });
+    socket.on("playerReady", ({playerId: playerId, roomName: roomId}) => {
+      if (isReady){
+        
+      }
+    })
 
     // Add listener for stats updates
     socket.on('playerStats', ({ playerId: statsPlayerId, playerName: statsPlayerName, stats }) => {
@@ -155,7 +162,7 @@ export default function TypingRoom() {
                           : 'bg-purple-500 bg-opacity-20'
                       }`}
                     >
-                      <p className="font-bold text-2xl text-center">{player.name} {player.isHost ? '(Host)' : ''}</p>
+                      <p className="font-bold flex justify-between pl-5 items-center text-2xl text-center">{player.name} {player.isHost ? '(Host)' : ''} <span>{}</span></p>
                     </div>
                     {index === 0 && roomData.players.length > 1 && (
                       <div className="text-4xl font-bold">VS</div>

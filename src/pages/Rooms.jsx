@@ -20,41 +20,20 @@ export default function RoomsPage() {
   const router = useRouter()
   const [playerId, setPlayerId] = useState(null);
   const [playerDisplayName, setPlayerDisplayName] = useState(""); // For player display name input
-  const [roomName, setRoomName] = useState(''); // For room name input
-  const [currentRoom, setCurrentRoom] = useState(null);
-  const [isRoomFull, setIsRoomFull] = useState(false);
+  const [roomName, setRoomName] = useState(''); // For room name input 
   const [error, setError] = useState(null);
-  const [Rooms, setRooms] = useState(null)
+
 
   useEffect(() => {
-    const fetchRooms = async () => {
-      const response = await fetch("/rooms.json");
-      const data = await response.json();
-      setRooms(data);
-    };
+   
 
-    fetchRooms();
 
-    socket.on("roomJoined", ({ roomId }) => {
-      setCurrentRoom(roomId);
-      setIsRoomFull(false);
-      showToast(`Joined room ${roomId}`, "success");
-    });
-
-    socket.on("roomFull", ({ message, roomId }) => {
-      if (currentRoom !== roomId) {
-        setIsRoomFull(true); // Only set room full if it's not the current room
-        showToast(message, "error");
-      }
-    });
 
     socket.on("playerJoined", ({ playerId }) => {
       showToast(`Player ${playerId} joined the room`, "info");
     });
 
-    socket.on("playerDisconnected", ({ playerId }) => {
-      showToast(`Player ${playerId} disconnected`, "warning");
-    });
+   
 
     socket.on("roomCreated", ({ roomId, playerId, playerName }) => {
       router.push(`/TypingRoom?roomId=${roomId}&playerId=${playerId}&playerName=${playerName}`)

@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card'
 import '../app/globals.css'
 import TypingCmp from '../components/TypingCmp'
 import OpponentStats from '../components/OpponentStats'
+
 const socket = io("http://localhost:4000", {
   transports: ["websocket"],
 });
@@ -32,7 +33,7 @@ export default function TypingRoom() {
     accuracy: number;
     errors: number;
   } | null>(null);
-  
+
   const roomId = searchParams?.get('roomId')
   const playerId = searchParams?.get('playerId')
   const playerName = searchParams?.get('playerName')
@@ -76,14 +77,13 @@ export default function TypingRoom() {
     socket.on('playerJoined', ({ roomId: updatedRoomId, players }) => {
       console.log('Player joined:', players);
       if (updatedRoomId === roomId) {
-        setRoomData(prev => ({
+        setRoomData((prev) => ({
           ...prev!,
           players: players
-        }))
+        }));
       }
     });
 
-    // Add listener for stats updates
     socket.on('playerStats', ({ playerId: statsPlayerId, playerName: statsPlayerName, stats }) => {
       if (statsPlayerId !== playerId) {  // Only update if it's the opponent's stats
         setOpponentStats({
@@ -93,11 +93,10 @@ export default function TypingRoom() {
       }
     });
 
-    // Add to your useEffect socket listeners
     socket.on('playerDisconnected', ({ playerId: disconnectedPlayerId }) => {
       setRoomData(prev => {
         if (!prev) return null;
-        
+
         // If the disconnected player was the host, make the first remaining player the host
         const remainingPlayers = prev.players.filter(p => p.id !== disconnectedPlayerId);
         if (remainingPlayers.length > 0 && prev.players.find(p => p.id === disconnectedPlayerId)?.isHost) {
@@ -109,11 +108,6 @@ export default function TypingRoom() {
           players: remainingPlayers
         };
       });
-
-      // Alert if opponent disconnected
-      if (playerId !== disconnectedPlayerId) {
-        alert('Your opponent has disconnected!');
-      }
     });
 
     return () => {
@@ -134,7 +128,7 @@ export default function TypingRoom() {
   }
 
   return (
-    <div className="min-h-screen  bg-[url('/bg.jpg')] bg-cover bg-center">
+    <div className="min-h-screen bg-[url('/bg.jpg')] bg-cover bg-center">
       <Card className="w-full h-screen bg-purple-400 px-7 rounded-md bg-clip-padding backdrop-filter backdrop-blur-md bg-opacity-10 border-none">
         {opponentStats && <OpponentStats {...opponentStats} />}
         <CardHeader>
@@ -172,7 +166,6 @@ export default function TypingRoom() {
           />
         </CardContent>
       </Card>
-     
     </div>
   )
 }

@@ -27,11 +27,11 @@ const TypingCmp: React.FC<TypingCmpProps> = ({ socket, roomId, playerId }) => {
     totalTyped: 0,
   });
 
-  const inputRef = useRef<HTMLInputElement>(null);
+  const textAreaRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (inputRef.current) {
-      inputRef.current.focus();
+    if (textAreaRef.current) {
+      textAreaRef.current.focus();
     }
   }, []);
 
@@ -41,11 +41,10 @@ const TypingCmp: React.FC<TypingCmpProps> = ({ socket, roomId, playerId }) => {
       return;
     }
 
-    const timeElapsed = (Date.now() - startTime) / 1000 / 60; // in minutes
-    const wordsTyped = Math.round(currentPosition / 5); // Standard: 5 characters = 1 word
+    const timeElapsed = (Date.now() - startTime) / 1000 / 60;
+    const wordsTyped = Math.round(currentPosition / 5);
     const wpm = Math.round(wordsTyped / timeElapsed) || 0;
 
-    // Count current errors (only uncorrected ones)
     const currentErrorCount = Array.from(userInput).reduce((count, char, index) => {
       return count + (char !== sampleText[index] ? 1 : 0);
     }, 0);
@@ -59,45 +58,48 @@ const TypingCmp: React.FC<TypingCmpProps> = ({ socket, roomId, playerId }) => {
     setStats({
       wpm: timeElapsed > 0 ? wpm : 0,
       accuracy,
-      errors: currentErrorCount, // Only showing current errors
+      errors: currentErrorCount,
       totalTyped: currentPosition,
     });
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const input = e.target.value;
-    
-    // Handle backspace
-    if (input.length < userInput.length) {
-      setUserInput(input);
-      setCurrentPosition(input.length);
-      calculateStats();
-      return;
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    // Prevent default behavior for Tab key
+    if (e.key === 'Tab') {
+      e.preventDefault();
     }
 
-    // Handle regular typing
-    setUserInput(input);
-    setCurrentPosition(input.length);
-    calculateStats();
+    // Handle only printable characters and backspace
+    if (e.key === 'Backspace') {
+      if (userInput.length > 0) {
+        setUserInput(prev => prev.slice(0, -1));
+        setCurrentPosition(prev => prev - 1);
+        calculateStats();
+      }
+    } else if (e.key.length === 1) { // Only handle printable characters
+      const newInput = userInput + e.key;
+      setUserInput(newInput);
+      setCurrentPosition(newInput.length);
+      calculateStats();
+    }
   };
 
   const renderText = () => {
     return (
-      <div className="font-mono text-lg leading-relaxed whitespace-pre-wrap">
+      <>
         {Array.from(sampleText).map((char, index) => {
-          let charClass = "text-gray-400"; // Default untyped text
+          let charClass = "text-gray-400";
           
           if (index < userInput.length) {
             if (userInput[index] === char) {
-              charClass = "text-white"; // Correctly typed character
+              charClass = "text-white";
             } else {
-              charClass = "text-red-500"; // Incorrectly typed character
+              charClass = "text-red-500";
             }
           } else if (index === userInput.length) {
-            charClass = "text-white bg-white/20"; // Current character indicator
+            charClass = "text-white bg-white/20";
           }
 
-          // Add extra space after each word
           const isSpace = char === " ";
           const extraClass = isSpace ? "mr-1" : "";
 
@@ -107,7 +109,7 @@ const TypingCmp: React.FC<TypingCmpProps> = ({ socket, roomId, playerId }) => {
             </span>
           );
         })}
-      </div>
+      </>
     );
   };
 
@@ -133,18 +135,15 @@ const TypingCmp: React.FC<TypingCmpProps> = ({ socket, roomId, playerId }) => {
         <div>Errors: {currentErrors}</div>
       </div>
 
-      <div className="text-area p-4 bg-gray-900 rounded-lg">
+      <div
+        ref={textAreaRef}
+        tabIndex={0}
+        onKeyDown={handleKeyDown}
+        className="text-area p-4 bg-gray-900 rounded-lg font-mono text-lg leading-relaxed whitespace-pre-wrap focus:outline-none focus:ring-2 min-h-[200px] cursor-text"
+      >
         {renderText()}
+        <span className="animate-pulse">|</span>
       </div>
-
-      <input
-        ref={inputRef}
-        type="text"
-        value={userInput}
-        onChange={handleInputChange}
-        className="opacity-0 absolute left-0 w-full"
-        autoFocus
-      />
     </div>
   );
 };

@@ -99,16 +99,22 @@ export const initializeSocket = (server) => {
       io.to(roomName).emit('roomData', roomData);
     });
 
-      socket.on("playerReady", ({ playerId, roomName}) => {
-        const roomData = rooms.get(roomName);
-        const player = roomData.players.find(p => p.id === playerId);
-        if (player){
-          if (!roomData.ready.includes(playerId)){
-            roomData.ready.push(playerId);
-            
-          }
+    socket.on("playerReady", ({playerId, roomId}) => {
+      console.log("Received:", { playerId, roomId });
+      let room = rooms.get(roomId);
+      //Cherck if room is already exist
+      if (room) {
+        // Add player to the ready array if not already in it
+        console.log("Room is valid")
+        if (!room.ready.includes(playerId)) {
+          room.ready.push(playerId);
         }
-      })
+        console.log(room)
+        // Emit the updated room data to all players in the room
+       io.to(roomId).emit("roomData", room); // Emit updated room data
+      }
+    });
+    
 
     // Handle progress updates
     socket.on('updateProgress', (data) => {

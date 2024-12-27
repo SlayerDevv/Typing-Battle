@@ -4,6 +4,8 @@ import { useEffect, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { io } from 'socket.io-client'
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card'
+import { Button } from '@/components/ui/button'
+import { useCounter } from '@/hooks/useCounter'
 import { BadgeCheck } from 'lucide-react'
 import '../app/globals.css'
 import TypingCmp from '../components/TypingCmp'
@@ -23,6 +25,7 @@ interface RoomData {
   id: string
   players: Player[]
   status: string
+  ready: String[]
 }
 
 export default function TypingRoom() {
@@ -35,22 +38,28 @@ export default function TypingRoom() {
     accuracy: number;
     errors: number;
   } | null>(null);
-
+  const {toggleStart, toggleReset, toggleStop, Counter, isRunning, setIsRunning} = useCounter(10)
   const roomId = searchParams?.get('roomId')
-  const playerId = searchParams?.get('playerId')
+  const playerId = searchParams?.get('playerId');
   const playerName = searchParams?.get('playerName')
-
+  
+  // Fucntion to handle player ready and emit it to server
+  const handleReady = () => {
+    
+    socket.emit("playerReady", {playerId, roomId})
+    
+  }
   useEffect(() => {
     if (!roomId || !playerId || !playerName) {
       console.error('Missing required parameters')
       return
     }
-
     // First check if room exists
     socket.emit('getRoomData', { roomId });
 
+      
     socket.on('roomData', (data) => {
-      console.log('Received room data:', data);
+     // console.log('Received room data:', data);
       if (!data) {
         // Room doesn't exist, create it
         console.log('Creating new room:', roomId);
@@ -61,6 +70,7 @@ export default function TypingRoom() {
         socket.emit('joinRoom', { roomName: roomId, playerName, playerId });
       }
       setRoomData(data);
+     // console.log("RoomData", roomData)
     });
 
     socket.on('roomCreated', (data) => {
@@ -72,6 +82,7 @@ export default function TypingRoom() {
           name: data.playerName,
           isHost: true
         }],
+        ready: [],
         status: 'waiting'
       });
     });
@@ -79,17 +90,19 @@ export default function TypingRoom() {
     socket.on('playerJoined', ({ roomId: updatedRoomId, players }) => {
       console.log('Player joined:', players);
       if (updatedRoomId === roomId) {
-        setRoomData((prev) => ({
-          ...prev!,
-          players: players
-        }));
+          setRoomData((prev) => ({
+            ...prev!,
+            players: players
+          }));
       }
     });
-    socket.on("playerReady", ({playerId: playerId, roomName: roomId}) => {
-      if (isReady){
-        
-      }
-    })
+    // Check if players size is 2 and players are ready
+    if (roomData?.players.length! >= 2 && roomData?.ready.length! >= 2){
+      setTimeout(() => {
+        toggleStart();
+      }, 2000)
+    }
+   
 
     socket.on('playerStats', ({ playerId: statsPlayerId, playerName: statsPlayerName, stats }) => {
       if (statsPlayerId !== playerId) {  // Only update if it's the opponent's stats
@@ -117,14 +130,21 @@ export default function TypingRoom() {
       });
     });
 
+    // Listen for player ready event and update roomData with new data
+    socket.on("playerReady", (updatedRoomData) => {
+      console.log("Updated room data from server:", updatedRoomData);
+      setRoomData(updatedRoomData); // Room data is updated based on the server response
+    });
+    
     return () => {
       socket.off('playerJoined');
       socket.off('roomData');
       socket.off('roomCreated');
       socket.off('playerStats');
       socket.off('playerDisconnected');
+      socket.off('playerReady');
     }
-  }, [roomId, playerId, playerName])
+  }, [roomId, playerId, playerName, roomData?.players, isRunning])
 
   if (!roomData) {
     return (
@@ -144,6 +164,7 @@ export default function TypingRoom() {
         <CardContent>
           <div className="space-y-4">
             <div className="text-white">
+              <h1 onClick={toggleStart} className='text-4xl font-semibold mb-2 text-center'>Time elapsed : {Counter} s</h1>
               <h3 className="text-4xl font-semibold mb-2 text-center">Players:</h3>
               <div className="flex items-center justify-center gap-8">
                 {roomData.players.map((player, index) => (
@@ -156,7 +177,22 @@ export default function TypingRoom() {
                           : 'bg-purple-500 bg-opacity-20'
                       }`}
                     >
-                      <p className="font-bold flex justify-between pl-5 items-center text-2xl text-center">{player.name} {player.isHost ? '(Host)' : ''} <span>{}</span></p>
+                      <p className="font-bold flex justify-between pl-5 items-center text-2xl text-center">
+  {player.name} 
+  {player.isHost ? '(Host)' : ''} 
+  <span>
+    {roomData.ready.includes(player.id) ? (
+      <BadgeCheck color='#54B435' />
+    ) : (
+      player.id === playerId && (
+        <Button className='bg-yellow-400' onClick={handleReady}>
+          Ready
+        </Button>
+      )
+    )}
+  </span>
+</p>
+
                     </div>
                     {index === 0 && roomData.players.length > 1 && (
                       <div className="text-4xl font-bold">VS</div>

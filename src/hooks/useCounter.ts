@@ -7,22 +7,30 @@ export const useCounter = (initialTime = 60) => {
     useEffect(() => {
         let CounterInterval: any;
 
-        if (isRunning){
+        if (isRunning) {
             CounterInterval = setInterval(() => {
-                setCounter(prev => prev--);
-                if(Counter === 0){
-                    clearInterval(CounterInterval);
-                    setIsRunning(false);
-                }
-            }, 1000)
-        }else {
-            clearInterval(CounterInterval);
+                setCounter((prev) => {
+                    if (prev <= 1) {
+                        clearInterval(CounterInterval!);
+                        setIsRunning(false);
+                        return 0
+                    }
+                    return prev - 1;
+                });
+            }, 1000);
         }
-        return () => clearInterval(CounterInterval);
 
+        return () => {
+            if (CounterInterval) clearInterval(CounterInterval);
+        };
     }, [isRunning]);
+
     const toggleStart = () => setIsRunning(true);
     const toggleStop = () => setIsRunning(false);
-    const toggleReset = () => setCounter(initialTime)
-    return {toggleStart, toggleStop, toggleReset}
-}
+    const toggleReset = () => {
+        setIsRunning(false);
+        setCounter(initialTime);
+    };
+
+    return { toggleStart, toggleStop, toggleReset, Counter, isRunning, setIsRunning };
+};

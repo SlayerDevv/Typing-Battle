@@ -21,13 +21,14 @@ export const initializeSocket = (server) => {
 
     socket.on("setPlayerId", (id) => {
       playerId = id;
-      console.log(`Generated playerId for socket ${socket.id}: ${playerId}`);
+      console.log(`Generated playerId for socket Id " ${socket.id} ": for this player Id " ${playerId} "`);
     });
 
     socket.on("getRoomData", ({ roomId }) => {
       const roomData = rooms.get(roomId);
       if (roomData) {
         socket.emit("roomData", roomData);
+        console.log(`This room data qui envois au front ${roomId}`,roomData)
       }
     });
 
@@ -43,16 +44,16 @@ export const initializeSocket = (server) => {
       }
     });
     socket.on("createRoom", ({ roomName, playerName, playerId }) => {
-      if (rooms.has(roomName)) {
-        socket.emit("roomError", { message: "Room already exists" });
-        return;
-      }
+      // if (rooms.has(roomName)) {
+      //   socket.emit("roomError", { message: "Room already exists" });
+      //   return;
+      // }
 
       if (rooms.has(playerId)) {
         socket.emit("roomError", { message: "You already have room running" });
         return;
       }
-      playerId = uuidv4();
+
       const roomData = {
         id: roomName,
         players: [
@@ -94,7 +95,7 @@ export const initializeSocket = (server) => {
         socket.emit("roomError", { message: "Room is full" });
         return;
       }
-      console.log("playerid from join room socket", playerId);
+      console.log("le joueur qui en join le room ", playerId);
       const newPlayer = {
         id: playerId,
         name: playerName,
@@ -113,16 +114,15 @@ export const initializeSocket = (server) => {
       });
 
       io.to(roomName).emit("roomData", roomData);
-      console.log("Player joined room", roomName);
     });
 
     socket.on("playerReady", ({ playerId, roomId }) => {
-      console.log("Received:", { playerId, roomId });
+      console.log("Received for ready:", { playerId, roomId });
       let room = rooms.get(roomId);
       //Cherck if room is already exist
       if (room) {
         // Add player to the ready array if not already in it
-        console.log("Room is valid");
+        console.log("Room is valid for ready");
         if (!room.ready.includes(playerId)) {
           room.ready.push(playerId);
         }
@@ -162,12 +162,6 @@ export const initializeSocket = (server) => {
           (p) => p.id === playerId
         );
         roomData.players.forEach((player) => {
-          if (player.id === playerId) {
-            console.log("Player found in roomData.players");
-          }
-          if(!player.id){
-            console.error("Player id not found in roomData.players");
-          }
           console.log(
             `Comparing playerId: ${playerId} with player.id: ${player.id}`
           );
@@ -189,13 +183,11 @@ export const initializeSocket = (server) => {
           if (roomData.players.length === 0) {
             // Delay room deletion to handle reconnection
             setTimeout(() => {
-              console.log("Deleting room in 10 sec");
               if (roomData.players.length === 0) {
                 rooms.delete(roomId);
                 io.to(roomId).emit("roomDeleted");
               }
             }, 10000); // 10 seconds buffer before deleting the room
-            console.log("Room is empty");
           } else {
             io.to(roomId).emit("roomData", roomData);
           }
@@ -206,7 +198,6 @@ export const initializeSocket = (server) => {
             playerName: disconnectedPlayerName,
             remainingPlayers: roomData.players,
           });
-          console.log("Player disconnected");
 
           break;
         }

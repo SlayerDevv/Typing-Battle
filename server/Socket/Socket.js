@@ -113,6 +113,7 @@ export const initializeSocket = (server) => {
       });
 
       io.to(roomName).emit("roomData", roomData);
+      console.log("Player joined room", roomName);
     });
 
     socket.on("playerReady", ({ playerId, roomId }) => {

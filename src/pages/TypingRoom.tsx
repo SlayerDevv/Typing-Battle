@@ -15,6 +15,7 @@ import { BadgeCheck } from "lucide-react";
 import "../app/globals.css";
 import TypingCmp from "../components/TypingCmp";
 import OpponentStats from "../components/OpponentStats";
+import { toast } from "@/hooks/use-toast";
 
 const socket = io("http://localhost:4000", {
   transports: ["websocket"],
@@ -60,6 +61,21 @@ export default function TypingRoom() {
     socket.emit("playerReady", { playerId, roomId });
   };
 
+  interface ToastOptions {
+    title: string;
+    description?: string | null;
+    variant: "default" | "destructive" | null | undefined;
+  }
+
+  const showToast = (message: string, type: "default" | "destructive" | null | undefined): void => {
+    const options: ToastOptions = {
+      title: message,
+      description: type === "default" ? "success!" : null,
+      variant: type,
+    };
+    toast(options);
+  };
+
   useEffect(() => {
     if (!roomId || !playerId || !playerName) {
       console.error("Missing required parameters");
@@ -68,10 +84,10 @@ export default function TypingRoom() {
     // First check if room exists
     socket.emit("getRoomData", { roomId });
 
-    // console.log("RoomData", roomData)
+    console.log("RoomData", roomData)
 
     socket.on("roomData", (data) => {
-      //  console.log('Received room data:', data);
+        console.log('Received room data:', data);
       if (!data) {
         // Room doesn't exist, create it
         console.log("Creating new room:", roomId);
@@ -81,6 +97,7 @@ export default function TypingRoom() {
         console.log("Joining existing room:", roomId);
         socket.emit("joinRoom", { roomName: roomId, playerName, playerId });
       }
+      console.log("Setting room data: (1)", data);
       setRoomData(data);
     });
 
@@ -103,10 +120,12 @@ export default function TypingRoom() {
     socket.on("playerJoined", ({ roomId: updatedRoomId, players }) => {
       console.log("Player joined:", players);
       if (updatedRoomId === roomId) {
+        console.log("Setting room data: (2)", players);
         setRoomData((prev) => ({
           ...prev!,
           players: players,
         }));
+        showToast("Player joined", "default");
       }
     });
     // Check if players size is 2 and players are ready
@@ -136,9 +155,13 @@ export default function TypingRoom() {
     socket.on("reconnect", () => {
       console.log("Player reconnected to the room");
       socket.emit("getRoomData", { roomId });
+      showToast("Player reconnected to the room", "default");
     });
 
     socket.on("playerDisconnected", ({ playerId: disconnectedPlayerId }) => {
+      console.log("Player disconnected:", disconnectedPlayerId);
+      showToast("Player disconnected", "destructive");
+      
       setRoomData((prev) => {
         if (!prev) return null;
 
@@ -175,7 +198,7 @@ export default function TypingRoom() {
       socket.off("playerReady");
       socket.off("reconnect");
     };
-  }, [roomId, playerId, playerName, roomData?.players, roomData?.status]);
+  }, [roomId, playerId, playerName, JSON.stringify(roomData?.players), roomData?.status]);
 
   if (!roomData) {
     return (

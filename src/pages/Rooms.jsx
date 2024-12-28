@@ -93,6 +93,7 @@ export default function RoomsPage() {
         playerName,
         playerId,
       });
+      showToast("Room created", "success");
     }
   };
 
@@ -107,11 +108,13 @@ export default function RoomsPage() {
       setError(validationResult);
     } else {
       const { playerName, roomName: validatedRoomName } = validationResult.data;
+      console.log("Room joined", validationResult.data);
       socket.emit("joinRoom", {
         roomName: validatedRoomName,
         playerName,
         playerId,
       });
+      showToast("Room joined", "success");
     }
   };
 

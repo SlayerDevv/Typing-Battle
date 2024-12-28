@@ -17,13 +17,12 @@ export const handleCreateRoomAction = async ({
             RoomName,
         })
 
-        const playerId = uuidv4()
+       // const playerId = uuidv4()
 
         // Return the validated data for socket emission
         return {
             success: true,
             data: {
-                playerId,
                 playerName: playerDisplayName,
                 roomName: RoomName,
             }
@@ -51,13 +50,12 @@ export const handleJoinRoomAction = async ({
             RoomId,
         })
 
-        const playerId = uuidv4()
+     // const playerId = uuidv4()
 
         // Return the validated data for socket emission
         return {
             success: true,
             data: {
-                playerId,
                 playerName: playerDisplayName,
                 roomName: RoomId,
             }

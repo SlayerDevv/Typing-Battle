@@ -31,15 +31,21 @@ export default function RoomsPage() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
+    const playerId = localStorage.getItem("playerId") || uuidv4();
+      localStorage.setItem("playerId", playerId);
     socket.on("connect", () => {
       const playerId = localStorage.getItem("playerId") || uuidv4();
       localStorage.setItem("playerId", playerId);
+      console.log(`playerId: ${playerId}`);
       setPlayerId(playerId);
       socket.emit("setPlayerId", playerId);
     });
 
+    console.log(`playerId from useEffect: ${playerId}`);
+
     socket.on("roomCreated", ({ roomId, playerId, playerName }) => {
       console.log(`roomCreated: playerId from server: ${playerId}`);
+      alert( roomId )
       router.push(
         `/TypingRoom?roomId=${roomId}&playerId=${playerId}&playerName=${playerName}`
       );
@@ -47,6 +53,7 @@ export default function RoomsPage() {
 
     socket.on("playerJoined", ({ roomId, playerId, playerName }) => {
       console.log(`playerJoined: playerId from server: ${playerId}`);
+      alert(playerId)
       router.push(
         `/TypingRoom?roomId=${roomId}&playerId=${playerId}&playerName=${playerName}`
       );
@@ -93,6 +100,7 @@ export default function RoomsPage() {
         playerName,
         playerId,
       });
+      showToast(`Room created by ${playerId}`, "success");
     }
   };
 
@@ -107,11 +115,13 @@ export default function RoomsPage() {
       setError(validationResult);
     } else {
       const { playerName, roomName: validatedRoomName } = validationResult.data;
+      console.log("Room joined", validationResult.data);
       socket.emit("joinRoom", {
         roomName: validatedRoomName,
         playerName,
         playerId,
       });
+      showToast("Room joined", "success");
     }
   };
 

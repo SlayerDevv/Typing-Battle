@@ -16,6 +16,7 @@ import "../app/globals.css";
 import TypingCmp from "../components/TypingCmp";
 import TimerDisplay from "../components/TimerDisplay";
 import OpponentStats from "../components/OpponentStats";
+import { toast } from "@/hooks/use-toast";
 
 const socket = io("http://localhost:4000", {
   transports: ["websocket"],
@@ -38,6 +39,7 @@ export default function TypingRoom() {
   const searchParams = useSearchParams();
   const [roomData, setRoomData] = useState<RoomData | null>(null);
   const [isReady, setIsReady] = useState<Boolean>(false);
+  const [playerId, setPlayerId] = useState<string | null>(null);
   const [opponentStats, setOpponentStats] = useState<{
     playerName: string;
     wpm: number;
@@ -53,26 +55,51 @@ export default function TypingRoom() {
     setIsRunning,
   } = useCounter(10);
   const roomId = searchParams?.get("roomId");
-  const playerId = searchParams?.get("playerId");
+  console.log("roomId", roomId);
+  useEffect(() => {
+    const storedPlayerId = localStorage.getItem("playerId");
+    setPlayerId(storedPlayerId);
+    console.log("playerId from localstorage in typing room", storedPlayerId);
+  }, []);
   const playerName = searchParams?.get("playerName");
+  console.log("playerName", playerName);
 
   // Fucntion to handle player ready and emit it to server
   const handleReady = () => {
     socket.emit("playerReady", { playerId, roomId });
+    alert("You are ready");
+  };
+
+  interface ToastOptions {
+    title: string;
+    description?: string | null;
+    variant: "default" | "destructive" | null | undefined;
+  }
+
+  const showToast = (message: string, type: "default" | "destructive" | null | undefined): void => {
+    const options: ToastOptions = {
+      title: message,
+      description: type === "default" ? "success!" : null,
+      variant: type,
+    };
+    toast(options);
   };
 
   useEffect(() => {
     if (!roomId || !playerId || !playerName) {
-      console.error("Missing required parameters");
+      console.error(`Missing required parameters for TypingRoom ${roomId} , ${playerId} , ${playerName} `);
       return;
+    }
+    else {
+      console.log(`TypingRoom ${roomId} , ${playerId} , ${playerName} `);
     }
     // First check if room exists
     socket.emit("getRoomData", { roomId });
 
-    // console.log("RoomData", roomData)
+    console.log("RoomData", roomData)
 
     socket.on("roomData", (data) => {
-      //  console.log('Received room data:', data);
+        console.log('Received room data:', data);
       if (!data) {
         // Room doesn't exist, create it
         console.log("Creating new room:", roomId);
@@ -82,6 +109,7 @@ export default function TypingRoom() {
         console.log("Joining existing room:", roomId);
         socket.emit("joinRoom", { roomName: roomId, playerName, playerId });
       }
+      console.log("Setting room data: (1)", data);
       setRoomData(data);
     });
 
@@ -104,10 +132,12 @@ export default function TypingRoom() {
     socket.on("playerJoined", ({ roomId: updatedRoomId, players }) => {
       console.log("Player joined:", players);
       if (updatedRoomId === roomId) {
+        console.log("Setting room data: (2)", players);
         setRoomData((prev) => ({
           ...prev!,
           players: players,
         }));
+        showToast("Player joined", "default");
       }
     });
     // Check if players size is 2 and players are ready
@@ -138,9 +168,11 @@ export default function TypingRoom() {
     socket.on("reconnect", () => {
       console.log("Player reconnected to the room");
       socket.emit("getRoomData", { roomId });
+      showToast("Player reconnected to the room", "default");
     });
 
     socket.on("playerDisconnected", ({ playerId: disconnectedPlayerId }) => {
+      
       setRoomData((prev) => {
         if (!prev) return null;
 
@@ -160,6 +192,8 @@ export default function TypingRoom() {
           players: remainingPlayers,
         };
       });
+      console.log("Player disconnected:", disconnectedPlayerId);
+      showToast("Player disconnected", "destructive");
     });
 
     // Listen for player ready event and update roomData with new data
@@ -210,7 +244,7 @@ export default function TypingRoom() {
               </h3>
               <div className="flex items-center justify-center gap-8">
                 {roomData.players.map((player, index) => (
-                  <>
+                  <div className="flex items-center justify-center gap-8" key={player.id}>
                     <div
                       key={player.id}
                       className={`p-3 rounded-md w-64 ${
@@ -241,7 +275,7 @@ export default function TypingRoom() {
                     {index === 0 && roomData.players.length > 1 && (
                       <div className="text-4xl font-bold">VS</div>
                     )}
-                  </>
+                  </div>
                 ))}
               </div>
             </div>

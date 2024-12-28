@@ -14,6 +14,7 @@ import { useCounter } from "@/hooks/useCounter";
 import { BadgeCheck } from "lucide-react";
 import "../app/globals.css";
 import TypingCmp from "../components/TypingCmp";
+import TimerDisplay from "../components/TimerDisplay";
 import OpponentStats from "../components/OpponentStats";
 
 const socket = io("http://localhost:4000", {
@@ -115,6 +116,7 @@ export default function TypingRoom() {
       roomData?.ready.length! >= 2 &&
       roomData?.status == "running"
     ) {
+      
       setTimeout(() => {
         toggleStart();
       }, 2000);
@@ -175,7 +177,7 @@ export default function TypingRoom() {
       socket.off("playerReady");
       socket.off("reconnect");
     };
-  }, [roomId, playerId, playerName, roomData?.players, roomData?.status]);
+  }, [roomId, playerId, playerName, JSON.stringify(roomData?.players), roomData?.status]);
 
   if (!roomData) {
     return (
@@ -197,12 +199,9 @@ export default function TypingRoom() {
         <CardContent>
           <div className="space-y-4">
             <div className="text-white">
-              <h1
-                onClick={toggleStart}
-                className="text-4xl font-semibold mb-2 text-center"
-              >
-                Time elapsed : {Counter} s
-              </h1>
+
+            <TimerDisplay counter={Counter} status={roomData?.status} />
+          
               <h2 className="text-4xl font-semibold mb-2 text-center">
                 Status : {roomData.status}
               </h2>

@@ -11,7 +11,7 @@ import {
 } from "../components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useCounter } from "@/hooks/useCounter";
-import { BadgeCheck } from "lucide-react";
+import { BadgeCheck, Rss } from "lucide-react";
 import "../app/globals.css";
 import TypingCmp from "../components/TypingCmp";
 import TimerDisplay from "../components/TimerDisplay";
@@ -29,9 +29,16 @@ interface Player {
 
 interface RoomData {
   id: string;
+  sessionId: string;
   players: Player[];
   status: string;
   ready: String[];
+  disconnectedPlayers: Player[];
+}
+
+enum Status {
+  INGAME = "INGAME",
+  DISCONNECTED = "DISCONNECTED",
 }
 
 export default function TypingRoom() {
@@ -56,8 +63,6 @@ export default function TypingRoom() {
     setIsRunning,
   } = useCounter(10);
 
- 
-
   const searchParams = useSearchParams();
 
   useEffect(() => {
@@ -81,11 +86,14 @@ export default function TypingRoom() {
 
   useEffect(() => {
     const roomId = searchParams?.get("roomId");
+    const sessionId = localStorage.getItem("sessionId");
 
     if (!roomId || !playerId || !playerName) {
       console.error("Missing required parameters");
       return;
     }
+
+    
 
     socket.emit("getRoomData", { roomId });
 
@@ -95,19 +103,19 @@ export default function TypingRoom() {
       if (data.players.length === 0) {
         console.log("Creating new room:", roomId);
         socket.emit("createRoom", { roomName: roomId, playerName, playerId });
-      } else if (!data.players.find((p: Player) => p.id === playerId )) {
+      } else if (!data.players.find((p: Player) => p.id === playerId)) {
         console.log("Joining existing room:", roomId);
         socket.emit("joinRoom", { roomName: roomId, playerName, playerId });
       }
 
       setRoomData(data);
-      
     });
 
     socket.on("roomCreated", (data) => {
       console.log("Room created:", data);
       setRoomData({
         id: data.roomId,
+        sessionId: data.sessionId,
         players: [
           {
             id: data.playerId,
@@ -116,6 +124,7 @@ export default function TypingRoom() {
           },
         ],
         ready: [],
+        disconnectedPlayers: [],
         status: "waiting",
       });
     });
@@ -130,14 +139,17 @@ export default function TypingRoom() {
       }
     });
 
-    socket.on("playerStats", ({ playerId: statsPlayerId, playerName: statsPlayerName, stats }) => {
-      if (statsPlayerId !== playerId) {
-        setOpponentStats({
-          playerName: statsPlayerName,
-          ...stats,
-        });
+    socket.on(
+      "playerStats",
+      ({ playerId: statsPlayerId, playerName: statsPlayerName, stats }) => {
+        if (statsPlayerId !== playerId) {
+          setOpponentStats({
+            playerName: statsPlayerName,
+            ...stats,
+          });
+        }
       }
-    });
+    );
 
     socket.on("reconnect", () => {
       console.log("Player reconnected to the room");
@@ -148,8 +160,13 @@ export default function TypingRoom() {
       setRoomData((prev) => {
         if (!prev) return null;
 
-        const remainingPlayers = prev.players.filter((p) => p.id !== disconnectedPlayerId);
-        if (remainingPlayers.length > 0 && prev.players.find((p) => p.id === disconnectedPlayerId)?.isHost) {
+        const remainingPlayers = prev.players.filter(
+          (p) => p.id !== disconnectedPlayerId
+        );
+        if (
+          remainingPlayers.length > 0 &&
+          prev.players.find((p) => p.id === disconnectedPlayerId)?.isHost
+        ) {
           remainingPlayers[0].isHost = true;
         }
 
@@ -159,6 +176,12 @@ export default function TypingRoom() {
         };
       });
     });
+    if (RoomData?.status === "running" && !isRunning) {
+      toggleStart();
+    }
+    if (RoomData?.status === "waiting" && isRunning) {
+      toggleStop();
+    }
 
     socket.on("playerReady", (updatedRoomData) => {
       console.log("Updated room data from server:", updatedRoomData);
@@ -174,11 +197,18 @@ export default function TypingRoom() {
       socket.off("playerReady");
       socket.off("reconnect");
     };
-  }, [searchParams, playerId, playerName]);
+  }, [searchParams, playerId, playerName, RoomData?.players, RoomData?.status]);
 
   useEffect(() => {
     console.log("Updated RoomData:", RoomData);
-  }, [RoomData]);
+  }, [
+    roomId,
+    playerId,
+    playerName,
+    RoomData,
+    RoomData?.players,
+    RoomData?.status,
+  ]);
 
   if (!RoomData) {
     return (
@@ -201,32 +231,68 @@ export default function TypingRoom() {
           <div className="space-y-4">
             <div className="text-white">
               <TimerDisplay counter={Counter} status={RoomData?.status} />
-              <h2 className="text-4xl font-semibold mb-2 text-center">Status : {RoomData.status}</h2>
-              <h3 className="text-4xl font-semibold mb-2 text-center">Players:</h3>
+              <h2 className="text-4xl font-semibold mb-2 text-center">
+                Status : {RoomData.status}
+              </h2>
+              <h3 className="text-4xl font-semibold mb-2 text-center">
+                Players:
+              </h3>
               <div className="flex items-center justify-center gap-8">
                 {RoomData.players.map((player, index) => (
                   <>
-                    <div key={player.id} className={`p-3 rounded-md w-64 ${player.id === playerId ? "bg-green-500 bg-opacity-20" : "bg-purple-500 bg-opacity-20"}`}>
-                      <p className="font-bold flex justify-between items-center text-2xl text-center">
+                    <div
+                      key={player.id}
+                      className={`p-3 rounded-md w-64 ${
+                        player.id === playerId
+                          ? "bg-green-500 bg-opacity-20"
+                          : "bg-purple-500 bg-opacity-20"
+                      }`}
+                    >
+                      <p className="font-bold flex justify-between items-center gap-2 text-xl text-center">
                         {player.name}
                         {player.isHost ? "(Host)" : ""}
-                        <span>
-                          {RoomData.ready.includes(player.id) ? (
-                            <BadgeCheck color="#54B435" />
-                          ) : (
-                            player.id === playerId && <Button className="bg-yellow-400" onClick={handleReady}>Ready</Button>
-                          )}
-                        </span>
+                        <div className="">
+                          <span>
+                            {RoomData.ready.includes(player.id) ? (
+                              <span className="text-xs flex items-center text-green-500">
+                                Ready
+                              </span>
+                            ) : player.id === playerId ? (
+                              <Button
+                                className="bg-yellow-400"
+                                onClick={handleReady}
+                              >
+                                Ready
+                              </Button>
+                            ) : (
+                              <span className="text-xs text-red-400">
+                                Not ready
+                              </span>
+                            )}
+                          </span>
+                        </div>
                       </p>
                     </div>
-                    {index === 0 && RoomData.players.length > 1 && <div className="text-4xl font-bold">VS</div>}
+                    {index === 0 && RoomData.players.length > 1 && (
+                      <div className="text-4xl font-bold">VS</div>
+                    )}
                   </>
                 ))}
               </div>
             </div>
           </div>
           {RoomData.ready.length >= 2 ? (
-            <TypingCmp socket={socket} roomId={roomId!} playerId={playerId!} />
+            RoomData.status === "waiting" ? (
+              <span className="flex justify-center text-xl font-medium text-center">
+                Waiting for disconnected player to reconnect
+              </span>
+            ) : (
+              <TypingCmp
+                socket={socket}
+                roomId={roomId!}
+                playerId={playerId!}
+              />
+            )
           ) : (
             <div className="flex mt-[50px] items-center justify-center">
               <div className="text-white text-2xl">

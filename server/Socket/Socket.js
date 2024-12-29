@@ -1,5 +1,5 @@
 import { Server } from "socket.io";
-import { v4 as uuidv4 } from "uuid";
+import { v4 as uuidv4, v7 as uuidv7 } from "uuid";
 
 let io;
 
@@ -16,46 +16,100 @@ export const initializeSocket = (server) => {
 
   const rooms = new Map();
   let playerId;
+  let sessionId;
   io.on("connection", (socket) => {
     console.log(`User connected: ${socket.id}`);
 
     socket.on("setPlayerId", (id) => {
       playerId = id;
-      console.log(`Generated playerId for socket Id " ${socket.id} ": for this player Id " ${playerId} "`);
+      console.log(
+        `Generated playerId for socket Id " ${socket.id} ": for this player Id " ${playerId} "`
+      );
+    });
+
+    /*      for (let [roomId, roomData] of rooms.entries()) {
+        const pId = roomData.disconnectedPlayers.find(p => p.id === playerId);
+        if (pId) {
+          roomData.disconnectedPlayers.splice(0, 1);
+          roomData.players.push(pId);
+          io.to(roomId).emit("roomData", roomData);
+        }
+      }*/
+    socket.on("validateSession", ({ sessionId, playerId }) => {
+      let roomData;
+      let isValid = false;
+      for (let [roomId, data] of rooms.entries()) {
+        if (data.sessionId === sessionId) {
+          roomData = data;
+          isValid = true;
+          break; // Exit the loop once the room is found
+        }
+      }
+      if (isValid) {
+        const player = roomData.disconnectedPlayers.find(
+          (p) => p.id === playerId
+        );
+        if (player) {
+          const playerName = player.name
+          socket.emit("sessionValidation", { isValid, roomData, playerName });
+          setTimeout(() => {
+            io.to(sessionId).emit("roomData", roomData);
+          }, 5000);
+        } else {
+          socket.emit("sessionValidation", { isValid: false });
+        }
+      } else {
+        socket.emit("sessionValidation", { isValid: false });
+      }
     });
 
     socket.on("getRoomData", ({ roomId }) => {
       const roomData = rooms.get(roomId);
       if (roomData) {
         socket.emit("roomData", roomData);
-        console.log(`This room data qui envois au front ${roomId}`,roomData)
+        // console.log(`This room data qui envois au front ${roomId}`,roomData)
       }
     });
 
     socket.on("reconnect", () => {
       console.log("User reconnected : ", socket.id);
       for (let [roomId, roomData] of rooms.entries()) {
-        const player = roomData.players.find((p) => p.id === playerId);
-        if (player) {
+        const playerIndex = roomData.disconnectedPlayers.findIndex(
+          (p) => p.id === playerId
+        );
+        const { id, playerName } = roomData.disconnectedPlayers[playerIndex];
+        if (playerIndex !== -1) {
           console.log("Reconnected player ", playerId);
+          // socket.emit("reconnect", {roomId})
           socket.join(roomId);
           io.to(roomId).emit("roomData", roomData);
+          roomData.players.push({
+            id: id,
+            name: playerName,
+            isHost: false,
+          });
+          roomData.disconnectedPlayers.splice(playerIndex, 1);
+          console.log("DDDDDDDDDDDDDDD");
+          if (roomData.players.length >= 2) {
+            roomData.status = "running";
+          }
         }
       }
     });
     socket.on("createRoom", ({ roomName, playerName, playerId }) => {
-      // if (rooms.has(roomName)) {
-      //   socket.emit("roomError", { message: "Room already exists" });
-      //   return;
-      // }
+      if (rooms.has(roomName)) {
+        socket.emit("roomError", { message: "Room already exists" });
+        return;
+      }
 
       if (rooms.has(playerId)) {
         socket.emit("roomError", { message: "You already have room running" });
         return;
       }
-
+      sessionId = uuidv7();
       const roomData = {
         id: roomName,
+        sessionId: sessionId,
         players: [
           {
             id: playerId,
@@ -63,6 +117,7 @@ export const initializeSocket = (server) => {
             isHost: true,
           },
         ],
+        disconnectedPlayers: [],
         ready: [],
         status: "waiting",
       };
@@ -74,6 +129,7 @@ export const initializeSocket = (server) => {
         roomId: roomName,
         playerId: playerId,
         playerName: playerName,
+        sessionId: sessionId,
       });
       io.to(roomName).emit("roomData", roomData);
       console.log("Room created");
@@ -96,17 +152,33 @@ export const initializeSocket = (server) => {
         return;
       }
       console.log("le joueur qui en join le room ", playerId);
-      const newPlayer = {
-        id: playerId,
-        name: playerName,
-        isHost: false,
-      };
-
-      roomData.players.push(newPlayer);
+      const playerIndex = roomData.disconnectedPlayers.findIndex(
+        (p) => p.id === playerId
+      );
+      if (playerIndex !== -1) {
+        console.log("le joueur qui en join le room ", playerId);
+        const { id, name, isHost } = roomData.disconnectedPlayers[playerIndex];
+        roomData.players.push({
+          id: id,
+          name: name,
+          isHost: isHost,
+        });
+        roomData.disconnectedPlayers.splice(playerIndex, 1);
+        // roomData.status = "running";
+      } else {
+        const newPlayer = {
+          id: playerId,
+          name: playerName,
+          isHost: false,
+        };
+        console.log("Adding new player", newPlayer);
+        roomData.players.push(newPlayer);
+      }
       socket.join(roomName);
 
       // Enhanced playerJoined event with complete player information
       io.to(roomName).emit("playerJoined", {
+        sessionId: sessionId,
         roomId: roomName,
         playerId: playerId,
         playerName: playerName,
@@ -114,6 +186,7 @@ export const initializeSocket = (server) => {
       });
 
       io.to(roomName).emit("roomData", roomData);
+      console.log("WSSLTTTT");
     });
 
     socket.on("playerReady", ({ playerId, roomId }) => {
@@ -171,10 +244,19 @@ export const initializeSocket = (server) => {
           const disconnectedPlayer = roomData.players[playerIndex];
           const wasHost = disconnectedPlayer.isHost;
           const disconnectedPlayerName = disconnectedPlayer.name;
+          const disconnectedPlayerId = disconnectedPlayer.id;
           console.log("Removing player");
           // Remove the player from the room
           roomData.players.splice(playerIndex, 1);
-
+          if (roomData.players.length === 0) {
+            rooms.delete(roomId);
+          }
+          roomData.disconnectedPlayers.push({
+            id: disconnectedPlayerId,
+            name: disconnectedPlayerName,
+            isHost: false,
+          });
+          roomData.status = "waiting";
           // Reassign host if necessary
           if (wasHost && roomData.players.length > 0) {
             roomData.players[0].isHost = true;
@@ -183,10 +265,8 @@ export const initializeSocket = (server) => {
           if (roomData.players.length === 0) {
             // Delay room deletion to handle reconnection
             setTimeout(() => {
-              if (roomData.players.length === 0) {
-                rooms.delete(roomId);
-                io.to(roomId).emit("roomDeleted");
-              }
+              rooms.delete(roomId);
+              io.to(roomId).emit("roomDeleted");
             }, 10000); // 10 seconds buffer before deleting the room
           } else {
             io.to(roomId).emit("roomData", roomData);

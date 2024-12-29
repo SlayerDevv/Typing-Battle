@@ -19,6 +19,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "@/hooks/use-toast";
 import { v4 as uuidv4 } from "uuid";
 
+
 let socket; // Define the socket globally to initialize after playerId is set
 
 export default function RoomsPage() {
@@ -27,7 +28,6 @@ export default function RoomsPage() {
   const [playerDisplayName, setPlayerDisplayName] = useState(""); // For player display name input
   const [roomName, setRoomName] = useState(""); // For room name input
   const [error, setError] = useState(null);
-  const [sessionId, setSessionId] = useState("");
 
   useEffect(() => {
     // Ensure playerId is available before socket connection
@@ -44,20 +44,7 @@ export default function RoomsPage() {
       query: { playerId }, // Send playerId during initial connection
     });
 
-    let sessionId = localStorage.getItem("sessionId");
-    if (sessionId) {
-      socket.emit("validateSession", { sessionId, playerId });
-    }
-
-    socket.on("sessionValidation", ({ isValid, roomData, playerName }) => {
-      if (isValid) {
-        router.push(
-          `/TypingRoom?sessionId=${sessionId}&roomId=${roomData.id}&playerId=${playerId}&playerName=${playerName}`
-        );
-      } else {
-        localStorage.removeItem("sessionId");
-      }
-    });
+    
     socket.on("connect", () => {
       console.log(`Connected with playerId: ${playerId}`);
     });
@@ -67,21 +54,22 @@ export default function RoomsPage() {
       setError("Failed to connect to server.");
     });
 
-    socket.emit("setPlayerId", playerId);
+    socket.emit("setPlayerId" , playerId);
 
-    socket.on("roomCreated", ({ roomId, playerId, playerName, sessionId }) => {
-      localStorage.setItem("sessionId", sessionId);
+
+    socket.on("roomCreated", ({ roomId, playerId, playerName }) => {
       console.log(`roomCreated: playerId from server: ${playerId}`);
+      localStorage.setItem("roomId", roomId);
       router.push(
-        `/TypingRoom?sessionId=${sessionId}&roomId=${roomId}&playerId=${playerId}&playerName=${playerName}`
+        `/TypingRoom?roomId=${roomId}&playerId=${playerId}&playerName=${playerName}`
       );
     });
 
-    socket.on("playerJoined", ({ roomId, playerId, playerName, sessionId }) => {
+    socket.on("playerJoined", ({ roomId, playerId, playerName }) => {
       console.log(`playerJoined: playerId from server: ${playerId}`);
-      localStorage.setItem("sessionId", sessionId);
+      localStorage.setItem("roomId", roomId);
       router.push(
-        `/TypingRoom?sessionId=${sessionId}&roomId=${roomId}&playerId=${playerId}&playerName=${playerName}`
+        `/TypingRoom?roomId=${roomId}&playerId=${playerId}&playerName=${playerName}`
       );
     });
 
@@ -126,6 +114,8 @@ export default function RoomsPage() {
         playerName,
         playerId,
       });
+
+      localStorage.setItem("roomName", validatedRoomName);
     }
   };
 
@@ -145,6 +135,7 @@ export default function RoomsPage() {
         playerName,
         playerId,
       });
+      localStorage.setItem("roomName", validatedRoomName);
     }
   };
 

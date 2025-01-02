@@ -81,7 +81,10 @@ export default function TypingRoom() {
       return;
     }
 
-    socket.emit("getRoomData", { roomId });
+     // Only set up initial data and listeners once
+     if (!RoomData) {  // Only emit getRoomData if we don't have room data yet
+      socket.emit("getRoomData", { roomId });
+    }
 
     socket.on("roomData", (data) => {
       console.log("Received room data:", data);
@@ -128,7 +131,7 @@ export default function TypingRoom() {
     if (
       RoomData?.players.length! >= 2 &&
       RoomData?.ready.length! >= 2 &&
-      RoomData?.status == "running"
+      RoomData?.status === "running"
     ) {
       setTimeout(() => {
         toggleStart();
@@ -153,13 +156,11 @@ export default function TypingRoom() {
       socket.off("playerReady");
       socket.off("reconnect");
     };
-  }, [searchParams, playerId, playerName]);
 
- 
-
-  useEffect(() => {
-    console.log("Updated RoomData:", RoomData);
-  }, [RoomData]);
+  },  [searchParams, playerId, playerName,
+    RoomData?.players, // Only depend on the length
+    RoomData?.ready,   // Only depend on ready length
+    RoomData?.status   ]);
 
   if (!RoomData) {
     return (
@@ -186,6 +187,7 @@ export default function TypingRoom() {
               <h3 className="text-4xl font-semibold mb-2 text-center">Players:</h3>
               <div className="flex items-center justify-center gap-8">
                 {RoomData.players.map((player, index) => (
+                  <>
                   <div key={player.id} className={`p-3 rounded-md w-64 ${player.id === playerId ? "bg-green-500 bg-opacity-20" : "bg-purple-500 bg-opacity-20"}`}>
                     <p className="font-bold flex justify-between items-center text-2xl text-center">
                       {player.name}
@@ -198,11 +200,12 @@ export default function TypingRoom() {
                         )}
                       </span>
                     </p>
-                  </div>
-                ))}
-                {RoomData.players.length > 1 && (
+                     </div>
+                   {index === 0 &&  RoomData.players.length > 1 && (
                   <div className="text-4xl font-bold">VS</div>
                 )}
+                </>
+                ))}
               </div>
             </div>
           </div>

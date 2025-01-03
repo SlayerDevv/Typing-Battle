@@ -81,7 +81,10 @@ export default function TypingRoom() {
       return;
     }
 
-    socket.emit("getRoomData", { roomId });
+     // Set up polling interval
+    const pollInterval = setInterval(() => {
+      socket.emit("getRoomData", { roomId });
+  }, 2000); // Poll every second, adjust timing as needed
 
     socket.on("roomData", (data) => {
       console.log("Received room data:", data);
@@ -128,7 +131,7 @@ export default function TypingRoom() {
     if (
       RoomData?.players.length! >= 2 &&
       RoomData?.ready.length! >= 2 &&
-      RoomData?.status == "running"
+      RoomData?.status === "running"
     ) {
       setTimeout(() => {
         toggleStart();
@@ -145,6 +148,7 @@ export default function TypingRoom() {
     });
 
     return () => {
+      clearInterval(pollInterval);
       socket.off("playerJoined");
       socket.off("roomData");
       socket.off("roomCreated");
@@ -153,13 +157,11 @@ export default function TypingRoom() {
       socket.off("playerReady");
       socket.off("reconnect");
     };
-  }, [searchParams, playerId, playerName]);
 
- 
-
-  useEffect(() => {
-    console.log("Updated RoomData:", RoomData);
-  }, [RoomData]);
+  },  [searchParams, playerId, playerName,
+    RoomData?.players.length, // Only depend on the length
+    RoomData?.ready.length,   // Only depend on ready length
+    RoomData?.status   ]);
 
   if (!RoomData) {
     return (
@@ -170,8 +172,8 @@ export default function TypingRoom() {
   }
 
   return (
-    <div className="min-h-screen bg-[url('/bg.jpg')] bg-cover bg-center">
-      <Card className="w-full h-screen bg-purple-400 px-7 rounded-md bg-clip-padding backdrop-filter backdrop-blur-md bg-opacity-10 border-none">
+    <div className={`min-h-screen bg-[url('/bg.jpg')] bg-cover bg-center `}>
+      <Card className={`w-full h-screen bg-purple-400 px-7 rounded-md bg-clip-padding backdrop-filter backdrop-blur-md bg-opacity-10 border-none`}>
         {opponentStats && <OpponentStats {...opponentStats} />}
         <CardHeader>
           <CardTitle className="text-white text-5xl text-center">
@@ -182,10 +184,11 @@ export default function TypingRoom() {
           <div className="space-y-4">
             <div className="text-white">
               <TimerDisplay counter={Counter} status={RoomData?.status} />
-              <h2 className="text-4xl font-semibold mb-2 text-center">Status : {RoomData.status}</h2>
+              <h2 className="text-4xl font-semibold mb-2 text-center">Status : {RoomData.status.toUpperCase()}</h2>
               <h3 className="text-4xl font-semibold mb-2 text-center">Players:</h3>
               <div className="flex items-center justify-center gap-8">
                 {RoomData.players.map((player, index) => (
+                  <>
                   <div key={player.id} className={`p-3 rounded-md w-64 ${player.id === playerId ? "bg-green-500 bg-opacity-20" : "bg-purple-500 bg-opacity-20"}`}>
                     <p className="font-bold flex justify-between items-center text-2xl text-center">
                       {player.name}
@@ -198,16 +201,17 @@ export default function TypingRoom() {
                         )}
                       </span>
                     </p>
-                  </div>
-                ))}
-                {RoomData.players.length > 1 && (
+                     </div>
+                   {index === 0 &&  RoomData.players.length > 1 && (
                   <div className="text-4xl font-bold">VS</div>
                 )}
+                </>
+                ))}
               </div>
             </div>
           </div>
           {RoomData.ready.length >= 2 ? (
-            <TypingCmp socket={socket} roomId={roomId!} playerId={playerId!} />
+            <TypingCmp socket={socket} roomId={roomId!} playerId={playerId!} counter={Counter} />
           ) : (
             <div className="flex mt-[50px] items-center justify-center">
               <div className="text-white text-2xl">

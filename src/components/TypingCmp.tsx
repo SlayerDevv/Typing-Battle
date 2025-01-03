@@ -11,9 +11,10 @@ interface TypingCmpProps {
   socket: any;
   roomId: string;
   playerId: string;
+  counter: number;
 }
 
-const TypingCmp: React.FC<TypingCmpProps> = ({ socket, roomId, playerId }) => {
+const TypingCmp: React.FC<TypingCmpProps> = ({ socket, roomId, playerId, counter}) => {
   const sampleText = "The quick brown fox jumps over the lazy dog. Programming is the art of telling another human what one wants the computer to do.";
   
   const [userInput, setUserInput] = useState<string>("");
@@ -138,8 +139,8 @@ const TypingCmp: React.FC<TypingCmpProps> = ({ socket, roomId, playerId }) => {
       <div
         ref={textAreaRef}
         tabIndex={0}
-        onKeyDown={handleKeyDown}
-        className="text-area p-4 bg-gray-900 rounded-lg font-mono text-lg leading-relaxed whitespace-pre-wrap focus:outline-none focus:ring-2 min-h-[200px] cursor-text"
+        onKeyDown={counter === 0 ? handleKeyDown : undefined}
+        className={`text-area p-4 bg-gray-900 rounded-lg font-mono text-lg leading-relaxed whitespace-pre-wrap focus:outline-none focus:ring-2 min-h-[200px] cursor-text`}
       >
         {renderText()}
         <span className="animate-pulse">|</span>

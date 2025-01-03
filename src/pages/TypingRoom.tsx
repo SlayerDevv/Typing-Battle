@@ -81,10 +81,10 @@ export default function TypingRoom() {
       return;
     }
 
-     // Only set up initial data and listeners once
-     if (!RoomData) {  // Only emit getRoomData if we don't have room data yet
+     // Set up polling interval
+    const pollInterval = setInterval(() => {
       socket.emit("getRoomData", { roomId });
-    }
+  }, 2000); // Poll every second, adjust timing as needed
 
     socket.on("roomData", (data) => {
       console.log("Received room data:", data);
@@ -148,6 +148,7 @@ export default function TypingRoom() {
     });
 
     return () => {
+      clearInterval(pollInterval);
       socket.off("playerJoined");
       socket.off("roomData");
       socket.off("roomCreated");
@@ -158,8 +159,8 @@ export default function TypingRoom() {
     };
 
   },  [searchParams, playerId, playerName,
-    RoomData?.players, // Only depend on the length
-    RoomData?.ready,   // Only depend on ready length
+    RoomData?.players.length, // Only depend on the length
+    RoomData?.ready.length,   // Only depend on ready length
     RoomData?.status   ]);
 
   if (!RoomData) {
@@ -171,8 +172,8 @@ export default function TypingRoom() {
   }
 
   return (
-    <div className="min-h-screen bg-[url('/bg.jpg')] bg-cover bg-center">
-      <Card className="w-full h-screen bg-purple-400 px-7 rounded-md bg-clip-padding backdrop-filter backdrop-blur-md bg-opacity-10 border-none">
+    <div className={`min-h-screen bg-[url('/bg.jpg')] bg-cover bg-center `}>
+      <Card className={`w-full h-screen bg-purple-400 px-7 rounded-md bg-clip-padding backdrop-filter backdrop-blur-md bg-opacity-10 border-none`}>
         {opponentStats && <OpponentStats {...opponentStats} />}
         <CardHeader>
           <CardTitle className="text-white text-5xl text-center">
@@ -183,7 +184,7 @@ export default function TypingRoom() {
           <div className="space-y-4">
             <div className="text-white">
               <TimerDisplay counter={Counter} status={RoomData?.status} />
-              <h2 className="text-4xl font-semibold mb-2 text-center">Status : {RoomData.status}</h2>
+              <h2 className="text-4xl font-semibold mb-2 text-center">Status : {RoomData.status.toUpperCase()}</h2>
               <h3 className="text-4xl font-semibold mb-2 text-center">Players:</h3>
               <div className="flex items-center justify-center gap-8">
                 {RoomData.players.map((player, index) => (
@@ -210,7 +211,7 @@ export default function TypingRoom() {
             </div>
           </div>
           {RoomData.ready.length >= 2 ? (
-            <TypingCmp socket={socket} roomId={roomId!} playerId={playerId!} />
+            <TypingCmp socket={socket} roomId={roomId!} playerId={playerId!} counter={Counter} />
           ) : (
             <div className="flex mt-[50px] items-center justify-center">
               <div className="text-white text-2xl">

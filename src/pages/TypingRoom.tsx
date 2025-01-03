@@ -74,7 +74,11 @@ export default function TypingRoom() {
 
       console.log("player id: ", playerId);
       console.log("player name: ", playerName);
+
+      
     }
+
+    socket.emit("setPlayerId" , playerId);
 
     if (!roomId || !playerId || !playerName) {
       console.error("Missing required parameters");
@@ -82,9 +86,9 @@ export default function TypingRoom() {
     }
 
      // Set up polling interval
-    const pollInterval = setInterval(() => {
+   
       socket.emit("getRoomData", { roomId });
-  }, 2000); // Poll every second, adjust timing as needed
+  
 
     socket.on("roomData", (data) => {
       console.log("Received room data:", data);
@@ -148,14 +152,13 @@ export default function TypingRoom() {
     });
 
     return () => {
-      clearInterval(pollInterval);
+      // clearInterval(pollInterval);
       socket.off("playerJoined");
       socket.off("roomData");
       socket.off("roomCreated");
       socket.off("playerStats");
-      socket.off("playerDisconnected");
       socket.off("playerReady");
-      socket.off("reconnect");
+
     };
 
   },  [searchParams, playerId, playerName,

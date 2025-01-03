@@ -20,7 +20,7 @@ import { toast } from "@/hooks/use-toast";
 import { v4 as uuidv4 } from "uuid";
 
 
-let socket; // Define the socket globally to initialize after playerId is set
+let socket; 
 
 export default function RoomsPage() {
   const router = useRouter();
@@ -81,7 +81,6 @@ export default function RoomsPage() {
       socket.off("roomJoined");
       socket.off("roomFull");
       socket.off("playerJoined");
-      socket.off("playerDisconnected");
       socket.off("roomCreated");
       socket.off("playerJoined");
       socket.off("roomError");

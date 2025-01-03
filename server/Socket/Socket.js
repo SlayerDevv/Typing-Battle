@@ -14,26 +14,26 @@ export const initializeSocket = (server) => {
   });
 
   const rooms = new Map();
-  let playerId;
+  // let playerId;
 
   io.on("connection", (socket) => {
     console.log(`User connected: ${socket.id}`);
 
     // Set Player ID
     socket.on("setPlayerId", (id) => {
-      playerId = id;
-      console.log(`Generated playerId for socket Id: ${socket.id} for this player Id: ${playerId}`);
+      socket.playerId = id;
+      console.log(`Generated playerId for socket Id: ${socket.id} for this player Id: ${socket.playerId}`);
     });
 
     // Retrieve room data and check for rejoining
     socket.on("getRoomData", ({ roomId }) => {
       const roomData = rooms.get(roomId);
       if (roomData) {
-        const player = roomData.players.find((p) => p.id === playerId);
+        const player = roomData.players.find((p) => p.id === socket.playerId);
         if (player && player.isDisconnected) {
           player.isDisconnected = false; // Restore player connection
           socket.join(roomId);
-          console.log(`Reconnected player: ${playerId}`);
+          console.log(`Reconnected player: ${socket.playerId}`);
         }
         socket.emit("roomData", roomData);
         console.log(`Room data sent to client for room: ${roomId}`, roomData);
@@ -101,7 +101,7 @@ export const initializeSocket = (server) => {
         id: playerId,
         name: playerName,
         isHost: false,
-        isDisconnected: false,  // Ensure every new player has this property
+        isDisconnected: false,  
       };
 
       roomData.players.push(newPlayer);
@@ -151,9 +151,9 @@ export const initializeSocket = (server) => {
 
     // Handle disconnections
     socket.on("disconnect", () => {
-      console.log(`User disconnected: ${playerId}`);
+      console.log(`User disconnected: ${socket.playerId}`);
       for (let [roomId, roomData] of rooms.entries()) {
-        const playerIndex = roomData.players.findIndex((p) => p.id === playerId);
+        const playerIndex = roomData.players.findIndex((p) => p.id === socket.playerId);
         if (playerIndex !== -1) {
           const disconnectedPlayer = roomData.players[playerIndex];
           disconnectedPlayer.isDisconnected = true; // Mark as disconnected
@@ -161,8 +161,15 @@ export const initializeSocket = (server) => {
           setTimeout(() => {
             // Remove player if not reconnected within 10 seconds
             if (disconnectedPlayer.isDisconnected) {
+              // Remove the player from players array
               roomData.players.splice(playerIndex, 1);
-              console.log(`Player ${playerId} permanently removed from room ${roomId}`);
+              // Find and remove the player ID from the ready array
+              const readyIndex = roomData.ready.indexOf(disconnectedPlayer.id);
+              if (readyIndex !== -1) {
+                roomData.ready.splice(readyIndex, 1);
+              }
+              roomData.status = "waiting";
+              console.log(`Player ${socket.playerId} permanently removed from room ${roomId}`);
               if (roomData.players.length === 0) {
                 rooms.delete(roomId);
                 console.log(`Room ${roomId} deleted`);
@@ -170,7 +177,7 @@ export const initializeSocket = (server) => {
                 io.to(roomId).emit("roomData", roomData);
               }
             }
-          }, 10000); // 10 seconds timeout
+          }, 10000); 
         }
       }
     });

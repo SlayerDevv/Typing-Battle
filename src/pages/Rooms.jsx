@@ -22,6 +22,21 @@ import { v4 as uuidv4 } from "uuid";
 
 let socket; 
 
+const textOptions = [
+  "The quick brown fox jumps over the lazy dog. Programming is the art of telling another human what one wants the computer to do.",
+  "In the world of coding, every semicolon matters. A single character can make the difference between a working program and a syntax error that keeps you debugging for hours.",
+  "Technology has revolutionized the way we live, work, and connect with others. As we continue to innovate, the possibilities seem endless in this digital age.",
+  "Software development is like building a house. You need a solid foundation, careful planning, and attention to detail. Testing ensures your structure won't collapse.",
+  "The best code is not just functional but also readable and maintainable. Clean code reads like well-written prose and tells a story about its purpose.",
+  "Artificial intelligence and machine learning are transforming industries across the globe. The future holds endless possibilities for those who embrace these technologies.",
+  "Great developers write code that humans can understand. Documentation is not just helpful; it's essential for maintaining and scaling software projects effectively.",
+  "Version control is like a time machine for your code. Git allows developers to experiment freely, knowing they can always return to a working state if needed.",
+  "The internet is a vast network connecting billions of devices worldwide. Every click, every search, and every message travels through this intricate web of connections.",
+  "Security in software development is not an afterthought but a fundamental requirement. Every line of code must be written with potential vulnerabilities in mind."
+];
+
+const sampleText = textOptions[Math.floor(Math.random() * textOptions.length)];
+
 export default function RoomsPage() {
   const router = useRouter();
   const [playerId, setPlayerId] = useState("");
@@ -110,6 +125,7 @@ export default function RoomsPage() {
       console.log("Room created", validationResult.data);
       socket.emit("createRoom", {
         roomName: validatedRoomName,
+        text: sampleText,
         playerName,
         playerId,
       });

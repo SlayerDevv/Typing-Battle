@@ -41,7 +41,7 @@ export const initializeSocket = (server) => {
     });
 
     // Handle room creation
-    socket.on("createRoom", ({ roomName, playerName, playerId }) => {
+    socket.on("createRoom", ({ roomName, playerName, playerId,text }) => {
       if (rooms.has(roomName)) {
         socket.emit("roomError", { message: "Room already exists" });
         return;
@@ -54,6 +54,7 @@ export const initializeSocket = (server) => {
 
       const roomData = {
         id: roomName,
+        text: text,
         players: [
           {
             id: playerId,
@@ -65,18 +66,19 @@ export const initializeSocket = (server) => {
         ready: [],
         status: "waiting",
       };
-
+      console.log("Creating room with data:", roomData);
       rooms.set(roomName, roomData);
 
       socket.join(roomName);
 
       io.to(roomName).emit("roomCreated", {
         roomId: roomName,
+        text: text,
         playerId: playerId,
         playerName: playerName,
       });
       io.to(roomName).emit("roomData", roomData);
-      console.log("Room created");
+      console.log("Room created with text:", text);
     });
 
     // Handle player joining

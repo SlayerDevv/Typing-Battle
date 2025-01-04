@@ -4,16 +4,19 @@ import { v4 as uuidv4 } from 'uuid'
 
 export const handleCreateRoomAction = async ({
     createRoomSchema,
+    text,
     playerDisplayName,
     RoomName,
 }: {
     createRoomSchema: ObjectSchema,
+    text: string,
     playerDisplayName: string,
     RoomName: string,
 }) => {
     try {
         await createRoomSchema.validate({
             playerDisplayName,
+            text,
             RoomName,
         })
 
@@ -24,6 +27,7 @@ export const handleCreateRoomAction = async ({
             success: true,
             data: {
                 playerName: playerDisplayName,
+                text: text,
                 roomName: RoomName,
             }
         }

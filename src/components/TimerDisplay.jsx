@@ -20,6 +20,8 @@ const TrafficLightTimer = ({ counter, status }) => {
   const colors = getColors();
 
   return (
+    <div className='absolute w-full h-screen bg-black bg-opacity-55 z-50 right-0 top-0'>
+
     <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
       <Card className="bg-gray-900 p-6 rounded-xl">
         <CardContent className="flex flex-col items-center gap-4 p-4">
@@ -38,12 +40,13 @@ const TrafficLightTimer = ({ counter, status }) => {
           
          
           <div className="mt-4 bg-gray-800 px-4 py-2 rounded-lg">
-            <span className="text-2xl font-mono font-bold text-white">
+            <span className="text-5xl  font-bold text-white">
               {counter}s
             </span>
           </div>
         </CardContent>
       </Card>
+    </div>
     </div>
   );
 };

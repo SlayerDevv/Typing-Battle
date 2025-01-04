@@ -29,6 +29,7 @@ interface Player {
 
 interface RoomData {
   id: string;
+  text: string;
   players: Player[];
   status: string;
   ready: String[];
@@ -61,6 +62,20 @@ export default function TypingRoom() {
     socket.emit("playerReady", { playerId, roomId });
    
   };
+  const textOptions = [
+    "The quick brown fox jumps over the lazy dog. Programming is the art of telling another human what one wants the computer to do.",
+    "In the world of coding, every semicolon matters. A single character can make the difference between a working program and a syntax error that keeps you debugging for hours.",
+    "Technology has revolutionized the way we live, work, and connect with others. As we continue to innovate, the possibilities seem endless in this digital age.",
+    "Software development is like building a house. You need a solid foundation, careful planning, and attention to detail. Testing ensures your structure won't collapse.",
+    "The best code is not just functional but also readable and maintainable. Clean code reads like well-written prose and tells a story about its purpose.",
+    "Artificial intelligence and machine learning are transforming industries across the globe. The future holds endless possibilities for those who embrace these technologies.",
+    "Great developers write code that humans can understand. Documentation is not just helpful; it's essential for maintaining and scaling software projects effectively.",
+    "Version control is like a time machine for your code. Git allows developers to experiment freely, knowing they can always return to a working state if needed.",
+    "The internet is a vast network connecting billions of devices worldwide. Every click, every search, and every message travels through this intricate web of connections.",
+    "Security in software development is not an afterthought but a fundamental requirement. Every line of code must be written with potential vulnerabilities in mind."
+  ];
+  
+  const sampleText = textOptions[Math.floor(Math.random() * textOptions.length)];
 
   useEffect(() => {
     const roomId = localStorage.getItem("roomId");
@@ -84,9 +99,8 @@ export default function TypingRoom() {
       console.error("Missing required parameters");
       return;
     }
-
-     // Set up polling interval
-   
+    console.log("room:", RoomData);
+     
       socket.emit("getRoomData", { roomId });
   
 
@@ -95,7 +109,7 @@ export default function TypingRoom() {
 
       if (!data) {
         console.log("Creating new room:", roomId);
-        socket.emit("createRoom", { roomName: roomId, playerName, playerId });
+        socket.emit("createRoom", { roomName: roomId, playerName, playerId, text: sampleText });
       } else if (!data.players.find((p: Player) => p.id === playerId)) {
         console.log("Joining existing room:", roomId);
         socket.emit("joinRoom", { roomName: roomId, playerName, playerId });
@@ -108,6 +122,7 @@ export default function TypingRoom() {
       console.log("Room created:", data);
       setRoomData({
         id: data.roomId,
+        text: data.text,
         players: [
           {
             id: data.playerId,
@@ -152,7 +167,6 @@ export default function TypingRoom() {
     });
 
     return () => {
-      // clearInterval(pollInterval);
       socket.off("playerJoined");
       socket.off("roomData");
       socket.off("roomCreated");
@@ -214,7 +228,7 @@ export default function TypingRoom() {
             </div>
           </div>
           {RoomData.ready.length >= 2 ? (
-            <TypingCmp socket={socket} roomId={roomId!} playerId={playerId!} counter={Counter} />
+            <TypingCmp socket={socket} roomId={roomId!} playerId={playerId!} counter={Counter} sampleText={RoomData.text}/>
           ) : (
             <div className="flex mt-[50px] items-center justify-center">
               <div className="text-white text-2xl">

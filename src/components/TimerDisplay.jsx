@@ -1,22 +1,51 @@
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 
-const TimerDisplay = ({ counter , status}) => {
-  if (counter === 0 || status ==='waiting') {
+const TrafficLightTimer = ({ counter, status }) => {
+  if (status === 'waiting' || counter === 0) {
     return null;
   }
 
+  // Determine which light should be active based on counter
+  const getColors = () => {
+    if (counter > 5) {
+      return ['bg-red-500', 'bg-gray-700', 'bg-gray-700']; // Red
+    } else if (counter > 0) {
+      return ['bg-gray-700', 'bg-yellow-400', 'bg-gray-700']; // Yellow
+    } else {
+      return ['bg-gray-700', 'bg-gray-700', 'bg-green-500 animate-pulse']; // Green when counter is 0
+    }
+  };
+
+  const colors = getColors();
+
   return (
-    <div className=" absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-      <Card className="bg-purple-500 bg-opacity-20">
-        <CardContent className="p-6">
-          <span className="text-4xl font-bold text-white">
-            Time elapsed: {counter}s
-          </span>
+    <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+      <Card className="bg-gray-900 p-6 rounded-xl">
+        <CardContent className="flex flex-col items-center gap-4 p-4">
+         
+          <div className="bg-gray-800 p-4 rounded-xl shadow-inner">
+            
+            {colors.map((color, index) => (
+              <div key={index} className="relative mb-4 last:mb-0">
+                <div className={`w-20 h-20 rounded-full ${color} shadow-lg relative`}>
+                  {/* Light reflection effect */}
+                  <div className="absolute top-2 left-4 w-4 h-4 bg-white opacity-30 rounded-full"></div>
+                </div>
+              </div>
+            ))}
+          </div>
+          
+         
+          <div className="mt-4 bg-gray-800 px-4 py-2 rounded-lg">
+            <span className="text-2xl font-mono font-bold text-white">
+              {counter}s
+            </span>
+          </div>
         </CardContent>
       </Card>
     </div>
   );
 };
 
-export default TimerDisplay;
+export default TrafficLightTimer;

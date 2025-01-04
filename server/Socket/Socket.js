@@ -168,6 +168,15 @@ export const initializeSocket = (server) => {
               if (readyIndex !== -1) {
                 roomData.ready.splice(readyIndex, 1);
               }
+
+              // Check if the disconnected player was the host
+              if (disconnectedPlayer.isHost && roomData.players.length > 0) {
+                // Assign a new host (first remaining player)
+                roomData.players[0].isHost = true;
+                console.log(`New host assigned: ${roomData.players[0].id}`);
+              }
+    
+
               roomData.status = "waiting";
               console.log(`Player ${socket.playerId} permanently removed from room ${roomId}`);
               if (roomData.players.length === 0) {

@@ -54,7 +54,7 @@ const TypingCmp: React.FC<TypingCmpProps> = ({ socket, roomId, playerId, counter
 
   // Add useEffect to check completion
   useEffect(() => {
-    if (userInput.length === sampleText.length && userInput === sampleText) {
+    if (userInput.length === sampleText.length) {
       setIsCompleted(true);
       
       socket.on("playerStats", ({ playerId: statsPlayerId, playerName: statsPlayerName, stats }: { playerId: string, playerName: string, stats: TypingStats }) => {
@@ -181,26 +181,26 @@ const TypingCmp: React.FC<TypingCmpProps> = ({ socket, roomId, playerId, counter
         <span className="animate-pulse">|</span>
       </div>
       <AlertDialog open={isCompleted}>
-        <AlertDialogContent className="bg-gray-800 text-white">
+        <AlertDialogContent className="bg-gray-800 text-white border-none ">
           <AlertDialogHeader>
             <AlertDialogTitle className="text-2xl font-bold text-center mb-4">
-              Race Completed! 🎉
+              Text Completed! 🎉
             </AlertDialogTitle>
             <AlertDialogDescription className="space-y-4 text-lg text-center">
               <div className="grid grid-cols-3 gap-4">
                 <div className="bg-gray-700 p-4 rounded-lg">
                   <div className="font-semibold text-white">WPM</div>
-                  <div className="text-2xl text-green-400">{stats.wpm}</div>
+                  <div className="text-2xl text-green-500 font-bold">{stats.wpm}</div>
                 </div>
                 <div className="bg-gray-700 p-4 rounded-lg">
                   <div className="font-semibold text-white">Accuracy</div>
-                  <div className="text-2xl text-blue-400">
+                  <div className="text-2xl text-blue-500 font-bold">
                     {stats.accuracy}%
                   </div>
                 </div>
                 <div className="bg-gray-700 p-4 rounded-lg">
                   <div className="font-semibold text-white">Errors</div>
-                  <div className="text-2xl text-red-400">{stats.errors}</div>
+                  <div className="text-2xl text-red-500 font-bold">{stats.errors}</div>
                 </div>
               </div>
               {opponentStats && (
@@ -211,19 +211,19 @@ const TypingCmp: React.FC<TypingCmpProps> = ({ socket, roomId, playerId, counter
                   <div className="grid grid-cols-3 gap-4">
                     <div className="bg-gray-700 p-4 rounded-lg">
                       <div className="font-semibold text-white">WPM</div>
-                      <div className="text-2xl text-green-400">
+                      <div className="text-2xl text-green-500 font-bold">
                         {opponentStats.wpm}
                       </div>
                     </div>
                     <div className="bg-gray-700 p-4 rounded-lg">
                       <div className="font-semibold text-white">Accuracy</div>
-                      <div className="text-2xl text-blue-400">
+                      <div className="text-2xl text-blue-500 font-bold">
                         {opponentStats.accuracy}%
                       </div>
                     </div>
                     <div className="bg-gray-700 p-4 rounded-lg">
                       <div className="font-semibold text-white">Errors</div>
-                      <div className="text-2xl text-red-400">
+                      <div className="text-2xl text-red-500 font-bold">
                         {opponentStats.errors}
                       </div>
                     </div>
@@ -235,7 +235,7 @@ const TypingCmp: React.FC<TypingCmpProps> = ({ socket, roomId, playerId, counter
           <AlertDialogFooter>
             <AlertDialogAction
               onClick={() => setIsCompleted(false)}
-              className="bg-green-500 hover:bg-green-600"
+              className="bg-green-500 hover:bg-green-600 w-full text-lg font-bold p-4 rounded-lg border"
             >
               Close
             </AlertDialogAction>

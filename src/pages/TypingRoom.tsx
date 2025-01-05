@@ -15,6 +15,7 @@ import { BadgeCheck } from "lucide-react";
 import "../app/globals.css";
 import TypingCmp from "../components/TypingCmp";
 import TimerDisplay from "../components/TimerDisplay";
+import SecondTimerDisplay from "../components/SecondTimerDisplay";
 import OpponentStats from "../components/OpponentStats";
 
 const socket = io("http://localhost:4000", {
@@ -55,6 +56,16 @@ export default function TypingRoom() {
     Counter,
     isRunning,
   } = useCounter(10);
+  const timer = useCounter(60);
+
+  useEffect(() => {
+    // Start the second timer when the first Counter reaches 0
+    if (Counter === 0 ) {
+      timer.toggleStart();
+    }
+  }, [Counter, timer]);
+
+
 
   const searchParams = useSearchParams();
 
@@ -81,6 +92,8 @@ export default function TypingRoom() {
     const roomId = localStorage.getItem("roomId");
     const playerId = localStorage.getItem("playerId");
     const playerName = searchParams?.get("playerName");
+
+    console.log("Second Timer Counter:", timer.Counter);
 
     if (roomId && playerId && playerName) {
       setRoomId(roomId);
@@ -190,6 +203,7 @@ export default function TypingRoom() {
 
   return (
     <div className={`min-h-screen bg-[url('/bg.jpg')] bg-cover bg-center `}>
+      
       <Card className={`w-full h-screen bg-purple-400 px-7 rounded-md bg-clip-padding backdrop-filter backdrop-blur-md bg-opacity-10 border-none`}>
         {opponentStats && <OpponentStats {...opponentStats} />}
         <CardHeader>
@@ -200,6 +214,7 @@ export default function TypingRoom() {
         <CardContent>
           <div className="space-y-4">
             <div className="text-white">
+              <SecondTimerDisplay counter={timer.Counter} status={RoomData?.status} />
               <TimerDisplay counter={Counter} status={RoomData?.status} />
               <h2 className="text-4xl font-semibold mb-2 text-center">Status : {RoomData.status.toUpperCase()}</h2>
               <h3 className="text-4xl font-semibold mb-2 text-center">Players:</h3>
@@ -228,7 +243,7 @@ export default function TypingRoom() {
             </div>
           </div>
           {RoomData.ready.length >= 2 ? (
-            <TypingCmp socket={socket} roomId={roomId!} playerId={playerId!} counter={Counter} sampleText={RoomData.text}/>
+            <TypingCmp socket={socket} roomId={roomId!} playerId={playerId!} counter={Counter} sampleText={RoomData.text} timer={timer.Counter}/>
           ) : (
             <div className="flex mt-[50px] items-center justify-center">
               <div className="text-white text-2xl">

@@ -22,9 +22,10 @@ interface TypingCmpProps {
   playerId: string;
   counter: number;
   sampleText: string;
+  timer:number;
 }
 
-const TypingCmp: React.FC<TypingCmpProps> = ({ socket, roomId, playerId, counter,sampleText}) => {
+const TypingCmp: React.FC<TypingCmpProps> = ({ socket, roomId, playerId, counter,sampleText,timer}) => {
   
   const [userInput, setUserInput] = useState<string>("");
   const [startTime, setStartTime] = useState<number | null>(null);
@@ -54,7 +55,7 @@ const TypingCmp: React.FC<TypingCmpProps> = ({ socket, roomId, playerId, counter
 
   // Add useEffect to check completion
   useEffect(() => {
-    if (userInput.length === sampleText.length) {
+    if (userInput.length === sampleText.length || timer === 0) {
       setIsCompleted(true);
       
       socket.on("playerStats", ({ playerId: statsPlayerId, playerName: statsPlayerName, stats }: { playerId: string, playerName: string, stats: TypingStats }) => {
@@ -71,7 +72,7 @@ const TypingCmp: React.FC<TypingCmpProps> = ({ socket, roomId, playerId, counter
         stats
       });
     }
-  }, [userInput, sampleText, stats, roomId, playerId, socket,stats]);
+  }, [userInput, sampleText, stats, roomId, playerId, socket,stats ,timer]);
 
   const calculateStats = () => {
     if (!startTime) {
@@ -174,7 +175,7 @@ const TypingCmp: React.FC<TypingCmpProps> = ({ socket, roomId, playerId, counter
       <div
         ref={textAreaRef}
         tabIndex={0}
-        onKeyDown={counter === 0 ? handleKeyDown : undefined}
+        onKeyDown={counter > 0 || timer === 0 ? undefined : handleKeyDown  }
         className={`text-area p-4 bg-gray-900 rounded-lg font-mono text-lg leading-relaxed whitespace-pre-wrap focus:outline-none focus:ring-2 min-h-[200px] cursor-text`}
       >
         {renderText()}

@@ -10,9 +10,9 @@ const TrafficLightTimer = ({ counter, status }) => {
   const getColors = () => {
     if (counter > 5) {
       return ['bg-red-500', 'bg-gray-700', 'bg-gray-700']; // Red
-    } else if (counter > 0) {
+    } else if (counter > 1) {
       return ['bg-gray-700', 'bg-yellow-400', 'bg-gray-700']; // Yellow
-    } else {
+    } else if (counter === 1) {
       return ['bg-gray-700', 'bg-gray-700', 'bg-green-500 animate-pulse']; // Green when counter is 0
     }
   };

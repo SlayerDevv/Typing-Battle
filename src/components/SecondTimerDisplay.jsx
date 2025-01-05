@@ -3,7 +3,7 @@ import { Circle } from "lucide-react";
 
 const SecondTimerDisplay = ({ counter, status }) => {
   // Calculate percentage for progress indication
-  const maxTime = 60; // Assuming 60 seconds max, adjust as needed
+  const maxTime = counter;
   const progress = (counter / maxTime) * 100;
   
   return (

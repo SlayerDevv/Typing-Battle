@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 
-export const useCounter = (initialTime = 60) => {
+export const useCounter = (initialTime = 0) => {
   const [Counter, setCounter] = useState(initialTime);
   const [isRunning, setIsRunning] = useState(false);
 

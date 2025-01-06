@@ -49,29 +49,6 @@ export default function TypingRoom() {
     errors: number;
   } | null>(null);
 
-  // const {
-  //   toggleStart,
-  //   toggleReset,
-  //   toggleStop,
-  //   Counter,
-  //   isRunning,
-  // } = useCounter(10);
-  // const timer = useCounter(60);
-
-  // useEffect(() => {
-  //   // Start the second timer when the first Counter reaches 0
-  //   if (Counter === 0 ) {
-  //     timer.toggleStart();
-  //   }
-  // }, [Counter, timer]);
-
-  // useEffect(() => {
-  //   if (RoomData?.text) {
-  //     const words = RoomData.text.split(" ").length;
-  //     const timerDuration = Math.ceil((words / 40) * 60); // Assuming 40 WPM average speed
-  //     setTimer(useCounter(timerDuration)); // Dynamically set the timer based on text length
-  //   }
-  // }, [RoomData?.text]);
 
 
   const {
@@ -81,27 +58,27 @@ export default function TypingRoom() {
     isRunning: isPreparationRunning,
   } = useCounter(10); 
 
-  // Main typing timer
+  
   const {
     toggleStart: startTypingTimer,
     toggleReset: resetTypingTimer,
     Counter: typingTime,
     setCounter: setTypingDuration, 
-  } = useCounter(); // Default to 60 seconds
+  } = useCounter(5); 
 
-  // Handle starting the typing timer when the preparation timer reaches 0
+  
   useEffect(() => {
     if (preparationTime === 0 && !isPreparationRunning) {
       startTypingTimer();
     }
   }, [preparationTime, isPreparationRunning, startTypingTimer]);
 
-  // Dynamically set the typing timer duration based on text length
+  
   useEffect(() => {
     if (RoomData?.text) {
       const chars = RoomData.text.length;
       const timerDuration = Math.ceil((chars / 5) / 40 * 60); 
-      setTypingDuration(timerDuration); // Set the main typing timer duration
+      setTypingDuration(timerDuration); 
     }
   }, [RoomData?.text, setTypingDuration]);
 
@@ -132,6 +109,9 @@ export default function TypingRoom() {
     const roomId = localStorage.getItem("roomId");
     const playerId = localStorage.getItem("playerId");
     const playerName = searchParams?.get("playerName");
+
+
+ 
 
 
     if (roomId && playerId && playerName) {
@@ -228,8 +208,8 @@ export default function TypingRoom() {
     };
 
   },  [searchParams, playerId, playerName,
-    RoomData?.players.length, // Only depend on the length
-    RoomData?.ready.length,   // Only depend on ready length
+    RoomData?.players.length, 
+    RoomData?.ready.length,   
     RoomData?.status ,  
     RoomData?.text]);
 

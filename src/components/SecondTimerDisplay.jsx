@@ -2,20 +2,18 @@ import React, { useState, useEffect } from "react";
 import { Circle } from "lucide-react";
 
 const SecondTimerDisplay = ({ counter, status }) => {
-  // const [maxTime, setMaxTime] = useState(counter); // Set initial maxTime from counter
+  const [maxTime, setMaxTime] = useState(counter); 
 
-  // useEffect(() => {
-  //   // Set maxTime only once when the component mounts
-  //   if (counter > 0 && maxTime === counter) {
-  //     setMaxTime(counter);
-  //   }
-  // }, [counter]);
+  useEffect(() => {
+    
+    if (counter > maxTime) {
+      setMaxTime(counter);
+    }
+  }, [counter]);
 
- const maxTime = counter; 
 
-  // Calculate progress percentage based on initial maxTime
   const progress = (counter / maxTime) * 100;
-  console.log("im in secondTimer page",maxTime);
+  
 
   return (
     <div className="fixed top-4 left-4 p-4 backdrop-blur-sm bg-slate-900/80 rounded-lg shadow-xl border border-slate-700">

@@ -49,21 +49,61 @@ export default function TypingRoom() {
     errors: number;
   } | null>(null);
 
-  const {
-    toggleStart,
-    toggleReset,
-    toggleStop,
-    Counter,
-    isRunning,
-  } = useCounter(10);
-  const timer = useCounter(60);
+  // const {
+  //   toggleStart,
+  //   toggleReset,
+  //   toggleStop,
+  //   Counter,
+  //   isRunning,
+  // } = useCounter(10);
+  // const timer = useCounter(60);
 
+  // useEffect(() => {
+  //   // Start the second timer when the first Counter reaches 0
+  //   if (Counter === 0 ) {
+  //     timer.toggleStart();
+  //   }
+  // }, [Counter, timer]);
+
+  // useEffect(() => {
+  //   if (RoomData?.text) {
+  //     const words = RoomData.text.split(" ").length;
+  //     const timerDuration = Math.ceil((words / 40) * 60); // Assuming 40 WPM average speed
+  //     setTimer(useCounter(timerDuration)); // Dynamically set the timer based on text length
+  //   }
+  // }, [RoomData?.text]);
+
+
+  const {
+    toggleStart: startPreparationTimer,
+    toggleReset: resetPreparationTimer,
+    Counter: preparationTime,
+    isRunning: isPreparationRunning,
+  } = useCounter(10); 
+
+  // Main typing timer
+  const {
+    toggleStart: startTypingTimer,
+    toggleReset: resetTypingTimer,
+    Counter: typingTime,
+    setCounter: setTypingDuration, 
+  } = useCounter(); // Default to 60 seconds
+
+  // Handle starting the typing timer when the preparation timer reaches 0
   useEffect(() => {
-    // Start the second timer when the first Counter reaches 0
-    if (Counter === 0 ) {
-      timer.toggleStart();
+    if (preparationTime === 0 && !isPreparationRunning) {
+      startTypingTimer();
     }
-  }, [Counter, timer]);
+  }, [preparationTime, isPreparationRunning, startTypingTimer]);
+
+  // Dynamically set the typing timer duration based on text length
+  useEffect(() => {
+    if (RoomData?.text) {
+      const chars = RoomData.text.length;
+      const timerDuration = Math.ceil((chars / 5) / 40 * 60); 
+      setTypingDuration(timerDuration); // Set the main typing timer duration
+    }
+  }, [RoomData?.text, setTypingDuration]);
 
 
 
@@ -93,7 +133,6 @@ export default function TypingRoom() {
     const playerId = localStorage.getItem("playerId");
     const playerName = searchParams?.get("playerName");
 
-    console.log("Second Timer Counter:", timer.Counter);
 
     if (roomId && playerId && playerName) {
       setRoomId(roomId);
@@ -166,7 +205,7 @@ export default function TypingRoom() {
       RoomData?.status === "running"
     ) {
       setTimeout(() => {
-        toggleStart();
+        startPreparationTimer();
       }, 2000);
     }
 
@@ -191,7 +230,8 @@ export default function TypingRoom() {
   },  [searchParams, playerId, playerName,
     RoomData?.players.length, // Only depend on the length
     RoomData?.ready.length,   // Only depend on ready length
-    RoomData?.status   ]);
+    RoomData?.status ,  
+    RoomData?.text]);
 
   if (!RoomData) {
     return (
@@ -214,8 +254,8 @@ export default function TypingRoom() {
         <CardContent>
           <div className="space-y-4">
             <div className="text-white">
-              <SecondTimerDisplay counter={timer.Counter} status={RoomData?.status} />
-              <TimerDisplay counter={Counter} status={RoomData?.status} />
+              <SecondTimerDisplay counter={typingTime} status={RoomData?.status} />
+              <TimerDisplay counter={preparationTime} status={RoomData?.status} />
               <h2 className="text-4xl font-semibold mb-2 text-center">Status : {RoomData.status.toUpperCase()}</h2>
               <h3 className="text-4xl font-semibold mb-2 text-center">Players:</h3>
               <div className="flex items-center justify-center gap-8">
@@ -243,7 +283,7 @@ export default function TypingRoom() {
             </div>
           </div>
           {RoomData.ready.length >= 2 ? (
-            <TypingCmp socket={socket} roomId={roomId!} playerId={playerId!} counter={Counter} sampleText={RoomData.text} timer={timer.Counter}/>
+            <TypingCmp socket={socket} roomId={roomId!} playerId={playerId!} counter={preparationTime} sampleText={RoomData.text} timer={typingTime}/>
           ) : (
             <div className="flex mt-[50px] items-center justify-center">
               <div className="text-white text-2xl">

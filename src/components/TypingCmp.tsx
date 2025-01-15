@@ -32,6 +32,7 @@ const TypingCmp: React.FC<TypingCmpProps> = ({ socket, roomId, playerId, counter
   const [currentPosition, setCurrentPosition] = useState<number>(0);
   const [currentErrors, setCurrentErrors] = useState<number>(0);
   const [isCompleted, setIsCompleted] = useState(false);
+  const [isSoundEnabled, setIsSoundEnabled] = useState(true);
   const [stats, setStats] = useState<TypingStats>({
     wpm: 0,
     accuracy: 100,
@@ -102,6 +103,36 @@ const TypingCmp: React.FC<TypingCmpProps> = ({ socket, roomId, playerId, counter
     });
   };
 
+  // Audio refs
+  const correctKeySound = useRef<HTMLAudioElement | null>(null);
+  const errorKeySound = useRef<HTMLAudioElement | null>(null);
+  const spaceKeySound = useRef<HTMLAudioElement | null>(null);
+
+  // Initialize audio elements
+  useEffect(() => {
+    correctKeySound.current = new Audio('/sounds/key-press.mp3');
+    errorKeySound.current = new Audio('/sounds/key-error.mp3');
+    spaceKeySound.current = new Audio('/sounds/key-space.mp3');
+
+    // Optional: Preload sounds
+    correctKeySound.current.preload = 'auto';
+    errorKeySound.current.preload = 'auto';
+    spaceKeySound.current.preload = 'auto';
+  }, []);
+
+  const playSound = (type: 'correct' | 'error' | 'space') => {
+    if (!isSoundEnabled) return;
+
+    const sound = type === 'correct' ? correctKeySound.current :
+                 type === 'error' ? errorKeySound.current :
+                 spaceKeySound.current;
+
+    if (sound) {
+      sound.currentTime = 0; // Reset sound to start
+      sound.play().catch(e => console.error('Error playing sound:', e));
+    }
+  };
+
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Tab') {
       e.preventDefault();
@@ -112,12 +143,21 @@ const TypingCmp: React.FC<TypingCmpProps> = ({ socket, roomId, playerId, counter
         setUserInput(prev => prev.slice(0, -1));
         setCurrentPosition(prev => prev - 1);
         calculateStats();
+        playSound('correct');
       }
     } else if (e.key.length === 1 && userInput.length < sampleText.length) {
       const newInput = userInput + e.key;
       setUserInput(newInput);
       setCurrentPosition(newInput.length);
       calculateStats();
+      // Determine which sound to play
+      if (e.key === ' ') {
+        playSound('space');
+      } else if (e.key === sampleText[userInput.length]) {
+        playSound('correct');
+      } else {
+        playSound('error');
+      }
     }
   };
 

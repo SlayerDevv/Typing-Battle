@@ -5,7 +5,6 @@ import { io } from "socket.io-client";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
@@ -18,7 +17,7 @@ import { createRoomSchema, joinRoomSchema } from "@/lib/validation";
 import { useRouter } from "next/navigation";
 import { toast } from "@/hooks/use-toast";
 import { v4 as uuidv4 } from "uuid";
-
+import Link from "next/link";
 
 let socket; 
 
@@ -155,7 +154,7 @@ export default function RoomsPage() {
   };
 
   return (
-    <div className='min-h-screen flex items-center justify-center bg-[url("/bg.jpg")] bg-cover bg-center'>
+    <div className='min-h-screen flex flex-col items-center justify-center gap-16 bg-[url("/bg.jpg")] bg-cover bg-center'>
       <div className="flex gap-16">
         {/* Create Room Card */}
         <Card className="w-full h-auto max-h-[500px] bg-purple-400 px-7 rounded-md bg-clip-padding backdrop-filter backdrop-blur-md bg-opacity-20 border border-gray-100">
@@ -241,6 +240,22 @@ export default function RoomsPage() {
           <CardFooter></CardFooter>
         </Card>
       </div>
+      <Link href="/IndividualRoom">
+      <Button
+                className=" bg-accent text-black hover:text-accent text-2xl p-6"
+              >
+                Play Alone
+      </Button>
+      </Link>
+
+      <Link href="/Leaderboard">
+      <Button
+                className=" bg-accent text-black hover:text-accent text-2xl p-6"
+              >
+                Leaderboard
+      </Button>
+      </Link>
+      
     </div>
   );
 }

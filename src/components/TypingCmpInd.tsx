@@ -48,6 +48,7 @@ const TypingCmpInd: React.FC<TypingCmpProps> = ({ playerId, counter, sampleText 
   useEffect(() => {
     if (userInput.length === sampleText.length) {
       setIsCompleted(true);
+      saveStats()
     }
   }, [userInput, sampleText]);
 
@@ -175,6 +176,30 @@ const TypingCmpInd: React.FC<TypingCmpProps> = ({ playerId, counter, sampleText 
       errors: 0,
       totalTyped: 0,
     });
+  }
+  const saveStats = async () => {
+    try {
+      const response = await fetch('/api/typing-stats', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          playerId,
+          stats: {
+            wpm: stats.wpm,
+            errors: stats.errors,
+            accuracy: stats.accuracy
+          }
+        })
+      })
+  
+      if (!response.ok) {
+        throw new Error('Failed to save stats')
+      }
+    } catch (error) {
+      console.error('Error saving stats:', error)
+    }
   }
 
   return (

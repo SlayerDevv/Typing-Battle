@@ -243,9 +243,16 @@ export default function RoomsPage() {
       <Link href="/IndividualRoom">
       <Button
                 className=" bg-accent text-black hover:text-accent text-2xl p-6"
-                onClick={handleJoinRoom}
               >
                 Play Alone
+      </Button>
+      </Link>
+
+      <Link href="/Leaderboard">
+      <Button
+                className=" bg-accent text-black hover:text-accent text-2xl p-6"
+              >
+                Leaderboard
       </Button>
       </Link>
       

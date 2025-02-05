@@ -6,7 +6,7 @@ export const initializeSocket = (server) => {
   io = new Server(server, {
     transports: ["websocket"],
     cors: {
-      origin: "http://localhost:3000",
+      origin: "*",
       methods: ["GET", "POST"],
       allowedHeaders: ["Content-Type"],
       credentials: true,

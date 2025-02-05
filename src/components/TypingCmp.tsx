@@ -229,6 +229,36 @@ const TypingCmp: React.FC<TypingCmpProps> = ({ socket, roomId, playerId, counter
     }
   }, [stats.wpm, stats.accuracy, currentErrors]);
 
+
+  const handleReset = () => {
+    // Reset all states to initial values
+    setUserInput("");
+    setStartTime(null);
+    setCurrentPosition(0);
+    setCurrentErrors(0);
+    setIsCompleted(false);
+    setStats({
+      wpm: 0,
+      accuracy: 100,
+      errors: 0,
+      totalTyped: 0,
+    });
+    setOpponentStats(null);
+  
+    // Focus back on the text area
+    if (textAreaRef.current) {
+      textAreaRef.current.focus();
+    }
+
+    socket.emit("resetRoom", { roomId, playerId });
+  
+    // Emit reset event to server if needed
+    socket.emit('playerReset', {
+      roomId,
+      playerId,
+    });
+  };
+
   return (
     <div className="max-w-3xl mx-auto p-6 space-y-6">
       <div className="stats flex justify-between mb-4 text-lg text-white">
@@ -268,6 +298,12 @@ const TypingCmp: React.FC<TypingCmpProps> = ({ socket, roomId, playerId, counter
                   <div className="font-semibold text-white">Errors</div>
                   <div className="text-2xl text-red-500 font-bold">{stats.errors}</div>
                 </div>
+                <button
+                onClick={handleReset}
+                    className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors"
+                  >
+                    Reset Game
+              </button>
               </div>
               {opponentStats && (
                 <div>

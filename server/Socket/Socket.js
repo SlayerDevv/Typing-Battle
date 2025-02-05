@@ -144,6 +144,25 @@ export const initializeSocket = (server) => {
       });
     });
 
+    socket.on('playerReset', ({ roomId, playerId }) => {
+      // Reset player state in room
+      console.log(`Player ${playerId} reset their game in room ${roomId}`);
+    });
+
+    socket.on("resetRoom", ({ roomId, playerId }) => {
+      // Find the room by roomId
+      let room = rooms.get(roomId);
+    
+      if (room) {
+       
+          room.ready=[],
+          room.status = "waiting";
+    
+        // Emit the updated room data to all players in the room
+        io.to(roomId).emit("roomData", room);
+      }
+    });
+
 
     
     //Handle race completion

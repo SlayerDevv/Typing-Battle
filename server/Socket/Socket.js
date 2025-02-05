@@ -144,12 +144,80 @@ export const initializeSocket = (server) => {
       });
     });
 
-    // Handle race completion
+
+    
+    //Handle race completion
     socket.on("completeRace", (roomId) => {
       io.to(roomId).emit("raceCompleted", {
         winnerId: playerId,
       });
     });
+
+
+    
+//     const activeRaces = new Map();
+
+// socket.on("completeRace", ({ roomId, playerId }) => {
+//   console.log(`\n=== Race Completion Event ===`);
+//   console.log(`Player ${playerId} has completed the race in room ${roomId}`);
+  
+//   let raceData = activeRaces.get(roomId);
+//   console.log('Current race state:', raceData || 'no active race');
+  
+//   // Initialize race data if it doesn't exist
+//   if (!raceData) {
+//     raceData = {
+//       count: 0,
+//       players: new Map(), // Use Map to store player data
+//       startTime: Date.now(),
+//       finishOrder: []
+//     };
+//     activeRaces.set(roomId, raceData);
+//     console.log(`Initialized new race in room ${roomId}`);
+//   }
+
+//   // Check if player already finished
+//   if (!raceData.players.has(playerId)) {
+//     // Add player completion data
+//     raceData.count += 1;
+//     raceData.players.set(playerId, {
+//       position: raceData.count,
+//       finishTime: Date.now()
+//     });
+//     raceData.finishOrder.push(playerId);
+
+//     console.log(`Player ${playerId} finished in position ${raceData.count}`);
+//     console.log(`Current race status: ${raceData.count}/2 players finished`);
+    
+//     // Emit completion event
+//     io.to(roomId).emit("raceCompleted", {
+//       playerId,
+//       position: raceData.count,
+//       totalFinished: raceData.count
+//     });
+
+//     // Check if race is complete (2 players finished)
+//     if (raceData.count === 2) {
+//       console.log(`\n=== Race Complete ===`);
+//       console.log(`Room ${roomId} - Final Results:`);
+//       raceData.finishOrder.forEach((id, index) => {
+//         console.log(`Position ${index + 1}: Player ${id}`);
+//       });
+
+//       // Emit race completion with final results
+//       io.to(roomId).emit("allPlayersFinished", {
+//         finishOrder: raceData.finishOrder,
+//         results: Object.fromEntries(raceData.players)
+//       });
+//     }
+//   } else {
+//     const playerData = raceData.players.get(playerId);
+//     console.log(`Player ${playerId} already finished in position ${playerData.position}`);
+//   }
+// });
+    
+
+
 
     // Handle disconnections
     socket.on("disconnect", () => {

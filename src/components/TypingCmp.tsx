@@ -23,10 +23,10 @@ interface TypingCmpProps {
   playerId: string;
   counter: number;
   sampleText: string;
-  timer:number;
+  
 }
 
-const TypingCmp: React.FC<TypingCmpProps> = ({ socket, roomId, playerId, counter,sampleText,timer}) => {
+const TypingCmp: React.FC<TypingCmpProps> = ({ socket, roomId, playerId, counter,sampleText}) => {
   
   const [userInput, setUserInput] = useState<string>("");
   const [startTime, setStartTime] = useState<number | null>(null);
@@ -46,6 +46,7 @@ const TypingCmp: React.FC<TypingCmpProps> = ({ socket, roomId, playerId, counter
     accuracy: number;
     errors: number;
   } | null>(null);
+ 
 
   const textAreaRef = useRef<HTMLDivElement>(null);
 
@@ -55,26 +56,49 @@ const TypingCmp: React.FC<TypingCmpProps> = ({ socket, roomId, playerId, counter
     }
   }, []);
 
-  // Add useEffect to check completion
   useEffect(() => {
-    if (userInput.length === sampleText.length || timer === 0) {
+    // Only set up the player stats listener once
+    socket.on("playerStats", ({ playerId: statsPlayerId, playerName: statsPlayerName, stats }: { playerId: string, playerName: string, stats: TypingStats }) => {
+      if (statsPlayerId !== playerId) {
+        setOpponentStats({
+          playerName: statsPlayerName,
+          ...stats,
+        });
+      }
+    });
+  
+    // Cleanup the listener when component unmounts
+    return () => {
+      socket.off("playerStats");
+    };
+  }, [socket, playerId,userInput]); // Only depend on socket and playerId
+  
+  // Third useEffect - check completion
+  useEffect(() => {
+    if (userInput.length === sampleText.length ) {
       setIsCompleted(true);
-      
-      socket.on("playerStats", ({ playerId: statsPlayerId, playerName: statsPlayerName, stats }: { playerId: string, playerName: string, stats: TypingStats }) => {
-        if (statsPlayerId !== playerId) {
-          setOpponentStats({
-            playerName: statsPlayerName,
-            ...stats,
-          });
-        }
-      });
       socket.emit('raceCompleted', {
         roomId,
         playerId,
         stats
       });
     }
-  }, [userInput, sampleText, stats, roomId, playerId, socket,stats ,timer,opponentStats]);
+  }, [userInput, sampleText, roomId, playerId, stats]);
+ 
+
+  // useEffect(() => {
+  //   socket.on("allPlayersFinished", () => {
+  //     stopTypingTimer();
+  //   });
+  
+  //   return () => {
+  //     socket.off("allPlayersFinished");
+  //   };
+  // }, [socket, stopTypingTimer]);
+
+ 
+
+
 
   const calculateStats = () => {
     if (!startTime) {
@@ -216,7 +240,7 @@ const TypingCmp: React.FC<TypingCmpProps> = ({ socket, roomId, playerId, counter
       <div
         ref={textAreaRef}
         tabIndex={0}
-        onKeyDown={counter > 0 || timer === 0 ? undefined : handleKeyDown  }
+        onKeyDown={counter > 0 ? undefined : handleKeyDown  }
         className={`text-area p-4 bg-gray-900 rounded-lg font-mono text-lg leading-relaxed whitespace-pre-wrap focus:outline-none focus:ring-2 min-h-[200px] cursor-text`}
       >
         {renderText()}

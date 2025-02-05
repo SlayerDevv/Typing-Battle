@@ -60,28 +60,28 @@ export default function TypingRoom() {
   } = useCounter(10); 
 
   
-  const {
-    toggleStart: startTypingTimer,
-    toggleReset: resetTypingTimer,
-    Counter: typingTime,
-    setCounter: setTypingDuration, 
-  } = useCounter(5); 
+  // const {
+  //   toggleStart: startTypingTimer,
+  //   toggleReset: resetTypingTimer,
+  //   Counter: typingTime,
+  //   setCounter: setTypingDuration, 
+  // } = useCounter(5); 
 
   
-  useEffect(() => {
-    if (preparationTime === 0 && !isPreparationRunning) {
-      startTypingTimer();
-    }
-  }, [preparationTime, isPreparationRunning, startTypingTimer]);
+  // useEffect(() => {
+  //   if (preparationTime === 0 && !isPreparationRunning) {
+  //     startTypingTimer();
+  //   }
+  // }, [preparationTime, isPreparationRunning, startTypingTimer]);
 
   
-  useEffect(() => {
-    if (RoomData?.text) {
-      const chars = RoomData.text.length;
-      const timerDuration = Math.ceil((chars / 5) / 40 * 60); 
-      setTypingDuration(timerDuration); 
-    }
-  }, [RoomData?.text, setTypingDuration]);
+  // useEffect(() => {
+  //   if (RoomData?.text) {
+  //     const chars = RoomData.text.length;
+  //     const timerDuration = Math.ceil((chars / 5) / 40 * 60); 
+  //     setTypingDuration(timerDuration); 
+  //   }
+  // }, [RoomData?.text, setTypingDuration]);
 
 
 
@@ -91,7 +91,7 @@ export default function TypingRoom() {
     socket.emit("playerReady", { playerId, roomId });
    
   };
-  const textOptions = [
+ const textOptions = [
     "The quick brown fox jumps over the lazy dog. Programming is the art of telling another human what one wants the computer to do.",
     "In the world of coding, every semicolon matters. A single character can make the difference between a working program and a syntax error that keeps you debugging for hours.",
     "Technology has revolutionized the way we live, work, and connect with others. As we continue to innovate, the possibilities seem endless in this digital age.",
@@ -235,7 +235,7 @@ export default function TypingRoom() {
         <CardContent>
           <div className="space-y-4">
             <div className="text-white">
-              <SecondTimerDisplay counter={typingTime} status={RoomData?.status} />
+              {/* <SecondTimerDisplay counter={typingTime} status={RoomData?.status} /> */}
               <TimerDisplay counter={preparationTime} status={RoomData?.status} />
               <h2 className="text-4xl font-semibold mb-2 text-center">Status : {RoomData.status.toUpperCase()}</h2>
               <h3 className="text-4xl font-semibold mb-2 text-center">Players:</h3>
@@ -264,7 +264,7 @@ export default function TypingRoom() {
             </div>
           </div>
           {RoomData.ready.length >= 2 ? (
-            <TypingCmp socket={socket} roomId={roomId!} playerId={playerId!} counter={preparationTime} sampleText={RoomData.text} timer={typingTime}/>
+            <TypingCmp socket={socket} roomId={roomId!} playerId={playerId!} counter={preparationTime} sampleText={RoomData.text} />
           ) : (
             <div className="flex mt-[50px] items-center justify-center">
               <div className="text-white text-2xl">

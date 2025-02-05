@@ -8,6 +8,7 @@ import {
   AlertDialogFooter,
   AlertDialogAction,
 } from "@/components/ui/alert-dialog";
+import OpponentStats from './OpponentStats';
 
 interface TypingStats {
   wpm: number;
@@ -73,7 +74,7 @@ const TypingCmp: React.FC<TypingCmpProps> = ({ socket, roomId, playerId, counter
         stats
       });
     }
-  }, [userInput, sampleText, stats, roomId, playerId, socket,stats ,timer]);
+  }, [userInput, sampleText, stats, roomId, playerId, socket,stats ,timer,opponentStats]);
 
   const calculateStats = () => {
     if (!startTime) {

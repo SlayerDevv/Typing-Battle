@@ -17,8 +17,9 @@ import TypingCmp from "../components/TypingCmp";
 import TimerDisplay from "../components/TimerDisplay";
 import SecondTimerDisplay from "../components/SecondTimerDisplay";
 import OpponentStats from "../components/OpponentStats";
+import {IP} from "./ip";
 
-const socket = io("http://localhost:4000", {
+const socket = io(`ws://${IP}:4000`, {
   transports: ["websocket"],
 });
 

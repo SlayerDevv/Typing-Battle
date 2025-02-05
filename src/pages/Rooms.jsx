@@ -18,6 +18,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "@/hooks/use-toast";
 import { v4 as uuidv4 } from "uuid";
 import Link from "next/link";
+import {IP} from "./ip";
 
 let socket; 
 
@@ -53,7 +54,7 @@ export default function RoomsPage() {
     setPlayerId(playerId);
 
     // Initialize the socket connection after playerId is ready
-    socket = io("http://localhost:4000", {
+    socket = io(`ws://${IP}:4000`, {
       transports: ["websocket"],
       query: { playerId }, // Send playerId during initial connection
     });

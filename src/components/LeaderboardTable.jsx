@@ -7,14 +7,44 @@ const LeaderboardTable = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // Revised scoring algorithm that heavily penalizes errors and low accuracy
+  const calculateOverallScore = (score) => {
+    // Base score starts with WPM
+    let baseScore = score.wpm;
+    
+    // Multiply by accuracy percentage (0-1) to heavily penalize low accuracy
+    // This means 50% accuracy would halve the score, 20% accuracy would reduce it to 1/5
+    baseScore *= (score.accuracy / 100);
+    
+    // Apply error penalty
+    // Each error reduces score by 5%
+    const errorPenalty = Math.max(0, 1 - (score.errors * 0.05));
+    baseScore *= errorPenalty;
+    
+    // If accuracy is below 50% or errors are above 20, 
+    // the score is severely reduced to prevent gaming the system
+    if (score.accuracy < 50 || score.errors > 20) {
+      baseScore *= 0.1;
+    }
+    
+    // Round to 1 decimal place
+    return Math.round(baseScore * 10) / 10;
+  };
+
   useEffect(() => {
     const fetchScores = async () => {
       try {
         const response = await fetch('/api/typing-stats');
         if (!response.ok) throw new Error('Failed to fetch scores');
         const data = await response.json();
-        // Sort by WPM in descending order
-        const sortedScores = data.sort((a, b) => b.wpm - a.wpm);
+        
+        // Add overall score to each entry and sort by it
+        const scoredData = data.map(score => ({
+          ...score,
+          overallScore: calculateOverallScore(score)
+        }));
+        
+        const sortedScores = scoredData.sort((a, b) => b.overallScore - a.overallScore);
         setScores(sortedScores);
       } catch (err) {
         setError(err.message);
@@ -65,19 +95,19 @@ const LeaderboardTable = () => {
         <table className="w-full">
           <thead>
             <tr className="text-gray-300 border-b border-gray-700">
-              <th className="p-4 text-center">Rank</th>
-              <th className="p-4 text-left">Player</th>
-              <th className="p-4 text-right">WPM</th>
-              <th className="p-4 text-right">Accuracy</th>
-              <th className="p-4 text-right">Errors</th>
-              <th className ='p-4 text-right'>Time Updated</th>
+              <th className="p-4">Rank</th>
+              <th className="p-4">Player</th>
+              <th className="p-4">WPM</th>
+              <th className="p-4">Accuracy</th>
+              <th className="p-4">Errors</th>
+              <th className="p-4">Time Updated</th>
             </tr>
           </thead>
           <tbody>
             {scores.map((score, index) => (
               <tr 
                 key={score._id} 
-                className="border-b border-gray-700 hover:bg-gray-700/50 transition-colors"
+                className="border-b border-gray-700 hover:bg-gray-700/50 transition-colors text-center"
               >
                 <td className="p-4">
                   <div className="flex justify-center items-center">
@@ -87,16 +117,16 @@ const LeaderboardTable = () => {
                 <td className="p-4 font-medium text-gray-200">
                   {score.playerId}
                 </td>
-                <td className="p-4 text-right text-green-400 font-bold">
+                <td className="p-4 text-green-400 font-bold">
                   {score.wpm}
                 </td>
-                <td className="p-4 text-right text-blue-400">
+                <td className="p-4 text-blue-400">
                   {score.accuracy}%
                 </td>
-                <td className="p-4 text-right text-red-400">
+                <td className="p-4 text-red-400">
                   {score.errors}
                 </td>
-                <td className="p-4 text-right text-gray-400">
+                <td className="p-4 text-gray-400">
                   {new Date(score.updatedAt).toLocaleString()}
                 </td>
               </tr>

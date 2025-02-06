@@ -71,7 +71,7 @@ const TypingCmp: React.FC<TypingCmpProps> = ({ socket, roomId, playerId, counter
     return () => {
       socket.off("playerStats");
     };
-  }, [socket, playerId,userInput]); // Only depend on socket and playerId
+  }, [socket, playerId]); // Only depend on socket and playerId
   
   // Third useEffect - check completion
   useEffect(() => {
@@ -83,7 +83,7 @@ const TypingCmp: React.FC<TypingCmpProps> = ({ socket, roomId, playerId, counter
         stats
       });
     }
-  }, [userInput, sampleText, roomId, playerId, stats]);
+  }, [userInput, sampleText, roomId, playerId, stats,socket,opponentStats]);
  
 
   // useEffect(() => {
@@ -243,7 +243,14 @@ const TypingCmp: React.FC<TypingCmpProps> = ({ socket, roomId, playerId, counter
       errors: 0,
       totalTyped: 0,
     });
-    setOpponentStats(null);
+    setOpponentStats(
+      opponentStats ? {
+        ...opponentStats,
+        wpm: 0,
+        accuracy: 100,
+        errors: 0,
+      } : null
+    );
   
     // Focus back on the text area
     if (textAreaRef.current) {

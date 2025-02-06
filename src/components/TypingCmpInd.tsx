@@ -231,7 +231,7 @@ const TypingCmpInd: React.FC<TypingCmpProps> = ({ playerId, counter, sampleText 
             <AlertDialogTitle className="text-2xl font-bold text-center mb-4">
               Text Completed! {playerId}🎉
             </AlertDialogTitle>
-            <AlertDialogDescription className="space-y-4 text-lg text-center">
+            <div className='text-center space-y-4 text-lg'>   
               <div className="grid grid-cols-3 gap-4">
                 <div className="bg-gray-700 p-4 rounded-lg">
                   <div className="font-semibold text-white">WPM</div>
@@ -248,7 +248,7 @@ const TypingCmpInd: React.FC<TypingCmpProps> = ({ playerId, counter, sampleText 
                   <div className="text-2xl text-red-500 font-bold">{stats.errors}</div>
                 </div>
               </div>
-            </AlertDialogDescription>
+              </div>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogAction

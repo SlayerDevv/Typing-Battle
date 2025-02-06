@@ -18,6 +18,7 @@ import TimerDisplay from "../components/TimerDisplay";
 import SecondTimerDisplay from "../components/SecondTimerDisplay";
 import OpponentStats from "../components/OpponentStats";
 import {IP} from "./ip";
+import React from "react";
 
 const socket = io(`ws://${IP}:4000`, {
   transports: ["websocket"],
@@ -217,58 +218,93 @@ export default function TypingRoom() {
   if (!RoomData) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[url('/bg.jpg')] bg-cover bg-center">
-        <div className="text-white text-2xl">Loading room data...</div>
+        <div className="text-white text-2xl">🎮 Loading room data... ⌛</div>
       </div>
     );
   }
 
   return (
-    <div className={`min-h-screen bg-[url('/bg.jpg')] bg-cover bg-center `}>
-      
+    <div className="min-h-screen bg-[url('/bg.jpg')] bg-cover bg-center ">
       <Card className={`w-full h-screen bg-purple-400 px-7 rounded-md bg-clip-padding backdrop-filter backdrop-blur-md bg-opacity-10 border-none`}>
         {opponentStats && <OpponentStats {...opponentStats} />}
-        <CardHeader>
-          <CardTitle className="text-white text-5xl text-center">
-            Room: {roomId}
+        
+        <CardHeader className="space-y-8">
+        <CardTitle className="text-white text-6xl text-center font-bold tracking-wide bg-clip-text">
+           Room: {roomId} 
           </CardTitle>
         </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            <div className="text-white">
-              {/* <SecondTimerDisplay counter={typingTime} status={RoomData?.status} /> */}
-              <TimerDisplay counter={preparationTime} status={RoomData?.status} />
-              <h2 className="text-4xl font-semibold mb-2 text-center">Status : {RoomData.status.toUpperCase()}</h2>
-              <h3 className="text-4xl font-semibold mb-2 text-center">Players:</h3>
-              <div className="flex items-center justify-center gap-8">
-                {RoomData.players.map((player, index) => (
-                  <>
-                  <div key={player.id} className={`p-3 rounded-md w-64 ${player.id === playerId ? "bg-green-500 bg-opacity-20" : "bg-purple-500 bg-opacity-20"}`}>
-                    <p className="font-bold flex justify-between items-center text-2xl text-center">
-                      {player.name}
-                      {player.isHost ? "(Host)" : ""}
+
+        <CardContent className="space-y-12">
+          <div className="text-white">
+            <TimerDisplay counter={preparationTime} status={RoomData?.status} />
+            
+            <div className="text-center space-y-8 mb-12">
+            <h2 className="text-4xl font-bold text-white bg-clip-text">
+               {RoomData.status === 'waiting' && '⏳'}
+                {RoomData.status === 'running' && '🏃'}
+                {RoomData.status.toUpperCase()}
+              </h2>
+              
+              <h3 className="text-4xl font-bold text-white bg-clip-text">
+                👥 Players 👥
+              </h3>
+            </div>
+
+            <div className="flex items-center justify-center gap-8 mb-12">
+              {RoomData.players.map((player, index) => (
+                <React.Fragment key={player.id}>
+                  <div className={`p-6 rounded-xl w-72 backdrop-blur-lg transform transition-all duration-300 
+                    ${player.id === playerId 
+                      ? "bg-white/10 border-2 border-green-400/20" 
+                      : "bg-white/10 border-2 border-white/20"}`}>
+                    <div className="font-bold flex justify-between items-center text-2xl">
+                    <span className="truncate">
+                        {player.id === playerId ? '🎮 ' : '🕹️ '}
+                        {player.name}
+                      </span>
+                      {player.isHost && (
+                        <span className="text-amber-300 text-sm font-normal">👑Host</span>
+                      )}
                       <span>
                         {RoomData.ready.includes(player.id) ? (
-                          <BadgeCheck color="#54B435" />
+                          <BadgeCheck className="w-8 h-8 text-green-400 animate-pulse" />
                         ) : (
-                          player.id === playerId && <Button className="bg-yellow-400" onClick={handleReady}>Ready</Button>
+                          player.id === playerId && (
+                            <Button 
+                              className="bg-gradient-to-r from-yellow-400 to-amber-500 hover:from-yellow-500 hover:to-amber-600 text-black font-bold transform transition-all duration-300 hover:scale-105 shadow-lg"
+                              onClick={handleReady}
+                            >
+                              Ready
+                            </Button>
+                          )
                         )}
                       </span>
-                    </p>
-                     </div>
-                   {index === 0 &&  RoomData.players.length > 1 && (
-                  <div className="text-4xl font-bold">VS</div>
-                )}
-                </>
-                ))}
-              </div>
+                    </div>
+                  </div>
+                  {index === 0 && RoomData.players.length > 1 && (
+                    <div className="text-5xl font-bold bg-gradient-to-r from-white to-white text-transparent bg-clip-text animate-pulse">
+                      VS
+                    </div>
+                  )}
+                </React.Fragment>
+              ))}
             </div>
           </div>
+
           {RoomData.ready.length >= 2 ? (
-            <TypingCmp socket={socket} roomId={roomId!} playerId={playerId!} counter={preparationTime} sampleText={RoomData.text} />
+            <div className="transform transition-all duration-500 hover:scale-[1.02]">
+              <TypingCmp
+                socket={socket}
+                roomId={roomId!}
+                playerId={playerId!}
+                counter={preparationTime}
+                sampleText={RoomData.text}
+              />
+            </div>
           ) : (
-            <div className="flex mt-[50px] items-center justify-center">
-              <div className="text-white text-2xl">
-                Waiting for players to ready .. {RoomData.ready.length}/2
+            <div className="flex mt-16 items-center justify-center">
+              <div className="text-3xl font-bold bg-gradient-to-r from-orange-300 to-red-400 text-transparent bg-clip-text animate-pulse">
+                Waiting for players to ready... {RoomData.ready.length}/2
               </div>
             </div>
           )}
@@ -276,4 +312,5 @@ export default function TypingRoom() {
       </Card>
     </div>
   );
-}
+};
+

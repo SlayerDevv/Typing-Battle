@@ -241,21 +241,29 @@ export default function RoomsPage() {
           <CardFooter></CardFooter>
         </Card>
       </div>
-      <Link href="/IndividualRoom">
-      <Button
-                className=" bg-accent text-black hover:text-accent text-2xl p-6"
-              >
-                Play Alone
-      </Button>
-      </Link>
 
-      <Link href="/Leaderboard">
-      <Button
-                className=" bg-accent text-black hover:text-accent text-2xl p-6"
-              >
-                Leaderboard
-      </Button>
+
+       <div className="flex flex-col md:flex-row gap-14 w-full max-w-xl">
+      <Link href="/IndividualRoom" className="w-full">
+        <Button className="w-full bg-gradient-to-br from-cyan-400 to-teal-500 hover:from-cyan-500 hover:to-teal-600 text-white text-xl py-8 px-6 rounded-2xl shadow-lg transform transition-all duration-300 hover:scale-105 hover:shadow-2xl border-2 border-cyan-200/30 group">
+          <span className="flex items-center justify-center gap-4 font-semibold">
+            <span className="text-3xl group-hover:animate-bounce">🎮</span>
+            Play Alone
+            <span className="text-3xl group-hover:animate-bounce">🚀</span>
+          </span>
+        </Button>
       </Link>
+      
+      <Link href="/Leaderboard" className="w-full">
+        <Button className="w-full bg-gradient-to-br from-pink-400 to-rose-500 hover:from-pink-500 hover:to-rose-600 text-white text-xl py-8 px-6 rounded-2xl shadow-lg transform transition-all duration-300 hover:scale-105 hover:shadow-2xl border-2 border-pink-200/30 group">
+          <span className="flex items-center justify-center gap-4 font-semibold">
+            <span className="text-3xl group-hover:animate-bounce">🏆</span>
+            Leaderboard
+            <span className="text-3xl group-hover:animate-bounce">👑</span>
+          </span>
+        </Button>
+      </Link>
+    </div>
       
     </div>
   );

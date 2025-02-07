@@ -1,7 +1,7 @@
 "use client"
 import { useUser } from "@clerk/nextjs";
 import TypingCmpInd from "../components/TypingCmpInd";
-import { useState } from "react";
+import { useState,useEffect } from "react";
 import { Button } from "../components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Keyboard, Loader2, Type } from "lucide-react";
@@ -41,6 +41,11 @@ const Individual = () => {
   };
 
   const { isSignedIn, user, isLoaded } = useUser();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   if (!isLoaded) {
     return (

@@ -7,7 +7,7 @@ type LayoutProps = {
   title?: string;
 };
 
-const Layout: React.FC<LayoutProps> = ({ children, title = 'Typing Battle' }) => {
+export default function Layout({ children, title = 'Typing Battle' }: LayoutProps) {
   return (
     <ClerkProvider>
       <div>
@@ -20,6 +20,4 @@ const Layout: React.FC<LayoutProps> = ({ children, title = 'Typing Battle' }) =>
       </div>
     </ClerkProvider>
   );
-};
-
-export default Layout;
+}

@@ -46,6 +46,7 @@ const Individual = () => {
   useEffect(() => {
     setMounted(true);
   }, []);
+  console.log(mounted)
 
   if (!isLoaded) {
     return (
@@ -115,3 +116,7 @@ const Individual = () => {
 };
 
 export default Individual;
+
+export async function getServerSideProps() {
+  return { props: {} };
+}

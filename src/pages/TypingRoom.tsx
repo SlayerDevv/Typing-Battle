@@ -20,9 +20,15 @@ import OpponentStats from "../components/OpponentStats";
 import {IP} from "./ip";
 import React from "react";
 
-const socket = io(`ws://${IP}:4000`, {
+const socket = io(`https://typing-battle.onrender.com/`, {
   transports: ["websocket"],
 });
+
+// if you using the website locally then comment the above code and uncomment bellow
+
+// const socket = io(`ws://${IP}:4000`, {
+//   transports: ["websocket"],
+// });
 
 interface Player {
   id: string;

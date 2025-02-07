@@ -22,12 +22,7 @@ const corsOptions = {
 app.use(express.json());
 app.use(cors(corsOptions));
 
-// Routes
-//app.use('ur endpoint',class)
 
-
-// Connect to MongoDB
-// connectDB();
 
 // Create HTTP server
 const server = http.createServer(app);

@@ -30,17 +30,17 @@ const TrafficLightTimer = ({ counter, status }) => {
             
             {colors.map((color, index) => (
               <div key={index} className="relative mb-4 last:mb-0">
-                <div className={`w-20 h-20 rounded-full ${color} shadow-lg relative`}>
+                <div className={`w-12 h-12 rounded-full ${color} `}>
                   {/* Light reflection effect */}
-                  <div className="absolute top-2 left-4 w-4 h-4 bg-white opacity-30 rounded-full"></div>
+                  <div className="absolute top-1 left-2 w-2 h-2 bg-white opacity-30 rounded-full"></div>
                 </div>
               </div>
             ))}
           </div>
           
          
-          <div className="mt-4 bg-gray-800 px-4 py-2 rounded-lg">
-            <span className="text-5xl  font-bold text-white">
+          <div className="mt-2 bg-gray-800 px-3 py-1 rounded-lg">
+            <span className="text-3xl  font-bold text-white">
               {counter}s
             </span>
           </div>

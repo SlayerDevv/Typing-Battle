@@ -4,6 +4,7 @@ import Individual from "@/pages/Individual";
 import { Card } from "@/components/ui/card";
 import { KeyRound } from "lucide-react";
 import Link from "next/link";
+import { ClerkProvider } from '@clerk/nextjs';
 import {
     SignInButton,
     SignedIn,
@@ -15,6 +16,7 @@ const IndividualRoom: React.FC = async () => {
 
   if (!userId) {
     return (
+      <ClerkProvider>
       <div className="min-h-screen flex items-center justify-center bg-[url('/bg.jpg')] bg-cover bg-center">
         <Card className="p-8 backdrop-blur-md bg-black/30 border-none shadow-2xl">
           <div className="flex flex-col items-center gap-4 text-white">
@@ -27,12 +29,14 @@ const IndividualRoom: React.FC = async () => {
           </div>
         </Card>
       </div>
+      </ClerkProvider>
     );
   }
 
   const user = await currentUser();
 
   return (
+    <ClerkProvider>
     <div className="min-h-screen bg-[url('/bg.jpg')] bg-cover bg-center bg-fixed">
    
       <div className="min-h-screen backdrop-blur-sm bg-black/40">
@@ -70,6 +74,7 @@ const IndividualRoom: React.FC = async () => {
         </div>
       </div>
     </div>
+    </ClerkProvider>
   );
 };
 

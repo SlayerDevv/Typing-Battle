@@ -5,7 +5,6 @@ import { Card } from "@/components/ui/card";
 import { KeyRound } from "lucide-react";
 import Link from "next/link";
 import {
-    ClerkProvider,
     SignInButton,
     SignedIn,
     SignedOut,

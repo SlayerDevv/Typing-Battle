@@ -8,7 +8,6 @@ import {
   AlertDialogFooter,
   AlertDialogAction,
 } from "@/components/ui/alert-dialog";
-import OpponentStats from './OpponentStats';
 
 interface TypingStats {
   wpm: number;
@@ -18,13 +17,15 @@ interface TypingStats {
 }
 
 interface TypingCmpProps {
-  socket: any;
+  socket: Socket;
   roomId: string;
   playerId: string;
   counter: number;
   sampleText: string;
   
 }
+import { Socket } from "socket.io-client";
+
 
 const TypingCmp: React.FC<TypingCmpProps> = ({ socket, roomId, playerId, counter,sampleText}) => {
   
@@ -33,7 +34,7 @@ const TypingCmp: React.FC<TypingCmpProps> = ({ socket, roomId, playerId, counter
   const [currentPosition, setCurrentPosition] = useState<number>(0);
   const [currentErrors, setCurrentErrors] = useState<number>(0);
   const [isCompleted, setIsCompleted] = useState(false);
-  const [isSoundEnabled, setIsSoundEnabled] = useState(true);
+  const [isSoundEnabled] = useState(true);
   const [stats, setStats] = useState<TypingStats>({
     wpm: 0,
     accuracy: 100,

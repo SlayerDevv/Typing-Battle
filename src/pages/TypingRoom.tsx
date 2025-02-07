@@ -15,9 +15,8 @@ import { BadgeCheck } from "lucide-react";
 import "../app/globals.css";
 import TypingCmp from "../components/TypingCmp";
 import TimerDisplay from "../components/TimerDisplay";
-import SecondTimerDisplay from "../components/SecondTimerDisplay";
 import OpponentStats from "../components/OpponentStats";
-import {IP} from "./ip";
+// import {IP} from "./ip";
 import React from "react";
 
 const socket = io(`https://typing-battle.onrender.com/`, {
@@ -41,7 +40,7 @@ interface RoomData {
   text: string;
   players: Player[];
   status: string;
-  ready: String[];
+  ready: string[];
 }
 
 export default function TypingRoom() {
@@ -49,7 +48,6 @@ export default function TypingRoom() {
   const [playerId, setPlayerId] = useState<string | null>(null);
   const [playerName, setPlayerName] = useState<string | null>(null);
   const [RoomData, setRoomData] = useState<RoomData | null>(null);
-  const [isReady, setIsReady] = useState<boolean>(false);
   const [opponentStats, setOpponentStats] = useState<{
     playerName: string;
     wpm: number;
@@ -61,9 +59,7 @@ export default function TypingRoom() {
 
   const {
     toggleStart: startPreparationTimer,
-    toggleReset: resetPreparationTimer,
     Counter: preparationTime,
-    isRunning: isPreparationRunning,
   } = useCounter(10); 
 
   
@@ -188,14 +184,15 @@ export default function TypingRoom() {
     });
 
     if (
-      RoomData?.players.length! >= 2 &&
-      RoomData?.ready.length! >= 2 &&
+      (RoomData?.players.length ?? 0) >= 2 &&
+      (RoomData?.ready.length ?? 0) >= 2 &&
       RoomData?.status === "running"
     ) {
       setTimeout(() => {
         startPreparationTimer();
       }, 2000);
     }
+    
 
     socket.on("playerStats", ({ playerId: statsPlayerId, playerName: statsPlayerName, stats }) => {
       if (statsPlayerId !== playerId) {

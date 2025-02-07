@@ -8,7 +8,6 @@ import {
   AlertDialogFooter,
   AlertDialogAction,
 } from "@/components/ui/alert-dialog";
-import OpponentStats from './OpponentStats';
 
 interface TypingStats {
   wpm: number;
@@ -18,13 +17,15 @@ interface TypingStats {
 }
 
 interface TypingCmpProps {
-  socket: any;
+  socket: Socket;
   roomId: string;
   playerId: string;
   counter: number;
   sampleText: string;
   
 }
+import { Socket } from "socket.io-client";
+
 
 const TypingCmp: React.FC<TypingCmpProps> = ({ socket, roomId, playerId, counter,sampleText}) => {
   
@@ -33,7 +34,7 @@ const TypingCmp: React.FC<TypingCmpProps> = ({ socket, roomId, playerId, counter
   const [currentPosition, setCurrentPosition] = useState<number>(0);
   const [currentErrors, setCurrentErrors] = useState<number>(0);
   const [isCompleted, setIsCompleted] = useState(false);
-  const [isSoundEnabled, setIsSoundEnabled] = useState(true);
+  const [isSoundEnabled] = useState(true);
   const [stats, setStats] = useState<TypingStats>({
     wpm: 0,
     accuracy: 100,
@@ -305,12 +306,6 @@ const TypingCmp: React.FC<TypingCmpProps> = ({ socket, roomId, playerId, counter
                   <div className="font-semibold text-white">Errors</div>
                   <div className="text-2xl text-red-500 font-bold">{stats.errors}</div>
                 </div>
-                <button
-                onClick={handleReset}
-                    className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors"
-                  >
-                    Reset Game
-              </button>
               </div>
               {opponentStats && (
                 <div>
@@ -344,10 +339,16 @@ const TypingCmp: React.FC<TypingCmpProps> = ({ socket, roomId, playerId, counter
           <AlertDialogFooter>
             <AlertDialogAction
               onClick={() => setIsCompleted(false)}
-              className="bg-green-500 hover:bg-green-600 w-full text-lg font-bold p-4 rounded-lg border"
+              className="bg-green-500 hover:bg-green-600 w-1/2 text-lg font-bold p-4 rounded-lg border"
             >
               Close
             </AlertDialogAction>
+            <AlertDialogAction
+                onClick={handleReset}
+                    className="px-4 py-2 bg-purple-600 w-1/2 hover:bg-purple-700 text-white rounded-lg transition-colors"
+                  >
+                    Reset Game
+              </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

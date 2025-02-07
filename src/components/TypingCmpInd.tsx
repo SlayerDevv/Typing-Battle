@@ -5,7 +5,6 @@ import {
   AlertDialogContent,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogAction,
 } from "@/components/ui/alert-dialog";
@@ -29,7 +28,7 @@ const TypingCmpInd: React.FC<TypingCmpProps> = ({ playerId, counter, sampleText 
   const [currentPosition, setCurrentPosition] = useState<number>(0);
   const [currentErrors, setCurrentErrors] = useState<number>(0);
   const [isCompleted, setIsCompleted] = useState(false);
-  const [isSoundEnabled, setIsSoundEnabled] = useState(true);
+  const [isSoundEnabled] = useState(true);
   const [stats, setStats] = useState<TypingStats>({
     wpm: 0,
     accuracy: 100,
@@ -252,7 +251,7 @@ const TypingCmpInd: React.FC<TypingCmpProps> = ({ playerId, counter, sampleText 
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogAction
-              onClick={() => {setIsCompleted(false),reset()}}
+              onClick={() => {setIsCompleted(false);reset()}}
               className="bg-green-500 hover:bg-green-600 w-full text-lg font-bold p-4 rounded-lg border"
             >
               Close

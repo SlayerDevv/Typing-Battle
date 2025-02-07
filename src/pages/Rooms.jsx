@@ -15,10 +15,9 @@ import { Alert, AlertDescription, AlertTitle } from "../components/ui/alert";
 import { handleCreateRoomAction, handleJoinRoomAction } from "@/lib/actions";
 import { createRoomSchema, joinRoomSchema } from "@/lib/validation";
 import { useRouter } from "next/navigation";
-import { toast } from "@/hooks/use-toast";
 import { v4 as uuidv4 } from "uuid";
 import Link from "next/link";
-import {IP} from "./ip";
+import {IP} from "../config/ip";
 
 let socket; 
 
@@ -54,10 +53,16 @@ export default function RoomsPage() {
     setPlayerId(playerId);
 
     // Initialize the socket connection after playerId is ready
-    socket = io(`ws://${IP}:4000`, {
+    socket = io(`https://typing-battle.onrender.com/`, {
       transports: ["websocket"],
       query: { playerId }, // Send playerId during initial connection
     });
+
+    // if you using the website locally then comment the above code and uncomment bellow
+
+    // const socket = io(`ws://${IP}:4000`, {
+    //   transports: ["websocket"],
+    // });
 
     
     socket.on("connect", () => {
@@ -103,13 +108,6 @@ export default function RoomsPage() {
     };
   }, [router]);
 
-  const showToast = (message, type) => {
-    toast({
-      title: message,
-      description: type === "success" ? "success!" : null,
-      variant: type,
-    });
-  };
 
   const handleCreateRoom = async () => {
     const validationResult = await handleCreateRoomAction({

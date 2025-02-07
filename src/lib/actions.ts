@@ -1,6 +1,4 @@
 import type {ObjectSchema} from 'joi'
-import { createRoomSchema, joinRoomSchema } from './validation'
-import { v4 as uuidv4 } from 'uuid'
 
 export const handleCreateRoomAction = async ({
     createRoomSchema,

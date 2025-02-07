@@ -5,7 +5,7 @@ import { useState } from "react";
 import { Button } from "../components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Keyboard, Loader2, Type } from "lucide-react";
-
+import { ClerkProvider } from "@clerk/nextjs";
 const Individual = () => {
   const phrases = [
     "The old library, with its towering shelves filled with dusty tomes and ancient manuscripts, seemed to hold the secrets of centuries past, whispering stories of forgotten worlds and long-lost civilizations to those who dared to listen closely in the silence.",
@@ -44,17 +44,20 @@ const Individual = () => {
 
   if (!isLoaded) {
     return (
+      <ClerkProvider>
       <div className="min-h-[50vh] flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
           <Loader2 className="w-8 h-8 animate-spin text-accent" />
           <p className="text-lg text-gray-200">Loading your practice session...</p>
         </div>
       </div>
+    </ClerkProvider>
     );
   }
 
   if (!isSignedIn) {
     return (
+      <ClerkProvider>
       <div className="min-h-[50vh] flex items-center justify-center">
         <Card className="p-8 text-center">
           <Type className="w-12 h-12 mx-auto mb-4 text-accent" />
@@ -62,10 +65,12 @@ const Individual = () => {
           <p className="text-gray-400">Please sign in to access the typing practice</p>
         </Card>
       </div>
+    </ClerkProvider>
     );
   }
 
   return (
+    <ClerkProvider>
     <div className="flex flex-col items-center gap-8 p-6">
 
       <Card className="w-full max-w-4xl p-6 bg-black/40 backdrop-blur-sm border-none">
@@ -100,6 +105,7 @@ const Individual = () => {
         </div>
       </Card>
     </div>
+    </ClerkProvider>
   );
 };
 

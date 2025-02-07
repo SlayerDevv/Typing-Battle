@@ -7,7 +7,7 @@ type LayoutProps = {
   title?: string;
 };
 
-export default function Layout({ children, title = 'Typing Battle' }: LayoutProps) {
+export default function IndividualRoomLayout({ children, title = 'Typing Battle' }: LayoutProps) {
   return (
     <ClerkProvider>
       <div>

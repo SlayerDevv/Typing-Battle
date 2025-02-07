@@ -81,7 +81,7 @@ const LeaderboardTable = () => {
       case 2:
         return <Award className="w-6 h-6 text-amber-600" />;
       default:
-        return <Trophy className="w-6 h-6 text-gray-600" />;
+        return <span className="text-gray-400 font-medium">{index + 1}</span>;
     }
   };
 
@@ -92,50 +92,55 @@ const LeaderboardTable = () => {
       </h2>
       
       <div className="overflow-x-auto">
-        <table className="w-full">
-          <thead>
-            <tr className="text-gray-300 border-b border-gray-700">
-              <th className="p-4">Rank</th>
-              <th className="p-4">Player</th>
-              <th className="p-4">WPM</th>
-              <th className="p-4">Accuracy</th>
-              <th className="p-4">Errors</th>
-              <th className="p-4">Time Updated</th>
-            </tr>
-          </thead>
-          <tbody>
-            {scores.map((score, index) => (
-              <tr 
-                key={score._id} 
-                className="border-b border-gray-700 hover:bg-gray-700/50 transition-colors text-center"
-              >
-                <td className="p-4">
-                  <div className="flex justify-center items-center">
-                    {getRankIcon(index)}
-                  </div>
-                </td>
-                <td className="p-4 font-medium text-gray-200">
-                  {score.playerId}
-                </td>
-                <td className="p-4 text-green-400 font-bold">
-                  {score.wpm}
-                </td>
-                <td className="p-4 text-blue-400">
-                  {score.accuracy}%
-                </td>
-                <td className="p-4 text-red-400">
-                  {score.errors}
-                </td>
-                <td className="p-4 text-gray-400">
-                  {new Date(score.updatedAt).toLocaleString()}
-                </td>
+        <div className="max-h-96 overflow-y-auto scrollbar-hide">
+          <table className="w-full">
+            <thead className="sticky top-0 bg-gray-800">
+              <tr className="text-gray-300 border-b border-gray-700">
+                <th className="p-4">Rank</th>
+                <th className="p-4">Player</th>
+                <th className="p-4">WPM</th>
+                <th className="p-4">Accuracy</th>
+                <th className="p-4">Errors</th>
+                <th className="p-4">Time Updated</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {scores.map((score, index) => (
+                <tr 
+                  key={score._id} 
+                  className="border-b border-gray-700 hover:bg-gray-700/50 transition-colors text-center"
+                >
+                  <td className="p-4">
+                    <div className="flex justify-center items-center">
+                      {getRankIcon(index)}
+                    </div>
+                  </td>
+                  <td className="p-4 font-medium text-gray-200">
+                    {score.playerId}
+                  </td>
+                  <td className="p-4 text-green-400 font-bold">
+                    {score.wpm}
+                  </td>
+                  <td className="p-4 text-blue-400">
+                    {score.accuracy}%
+                  </td>
+                  <td className="p-4 text-red-400">
+                    {score.errors}
+                  </td>
+                  <td className="p-4 text-gray-400">
+                    {new Date(score.updatedAt).toLocaleString()}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );
 };
+
+// Add these styles to your global CSS file
+
 
 export default LeaderboardTable;

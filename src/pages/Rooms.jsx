@@ -17,7 +17,7 @@ import { createRoomSchema, joinRoomSchema } from "@/lib/validation";
 import { useRouter } from "next/navigation";
 import { v4 as uuidv4 } from "uuid";
 import Link from "next/link";
-import {IP} from "./ip";
+import {IP} from "../config/ip";
 
 let socket; 
 

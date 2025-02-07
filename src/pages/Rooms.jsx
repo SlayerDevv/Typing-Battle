@@ -15,7 +15,6 @@ import { Alert, AlertDescription, AlertTitle } from "../components/ui/alert";
 import { handleCreateRoomAction, handleJoinRoomAction } from "@/lib/actions";
 import { createRoomSchema, joinRoomSchema } from "@/lib/validation";
 import { useRouter } from "next/navigation";
-import { toast } from "@/hooks/use-toast";
 import { v4 as uuidv4 } from "uuid";
 import Link from "next/link";
 import {IP} from "./ip";
@@ -109,13 +108,6 @@ export default function RoomsPage() {
     };
   }, [router]);
 
-  const showToast = (message, type) => {
-    toast({
-      title: message,
-      description: type === "success" ? "success!" : null,
-      variant: type,
-    });
-  };
 
   const handleCreateRoom = async () => {
     const validationResult = await handleCreateRoomAction({

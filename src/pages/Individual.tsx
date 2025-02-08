@@ -10,7 +10,7 @@ import { ClerkProvider } from "@clerk/nextjs";
 
 const Individual = () => {
   // Sample words for word mode
-  const words = [
+  const commonWords = [
     "the", "be", "to", "of", "and", "a", "in", "that", "have", "it", "for", 
     "not", "on", "with", "he", "as", "you", "do", "at", "this", "but", "his", 
     "by", "from", "they", "we", "say", "her", "she", "or", "an", "will", "my", 
@@ -80,8 +80,10 @@ const Individual = () => {
 
   type LengthType = 'short' | 'medium' | 'long';
 
+  type TextType = 'words' | 'phrases';
+
   const [settings, setSettings] = useState<{
-    type: 'words' | 'phrases';
+    type: TextType;
     length: LengthType;
   }>({
     type: "phrases", // 'words' or 'phrases'
@@ -91,7 +93,32 @@ const Individual = () => {
   const [randomText, setRandomText] = useState("");
   const [isAnimating, setIsAnimating] = useState(false);
   const [reset, setReset] = useState(false);
+  interface GenerateWordTextParams {
+    count: number;
+  }
 
+  const generateWordText = ({ count }: GenerateWordTextParams): string => {
+    const selectedWords: string[] = [];
+    const usedIndices: Set<number> = new Set();
+    
+    // Keep selecting words until we reach the desired count
+    while (selectedWords.length < count) {
+      const randomIndex: number = Math.floor(Math.random() * commonWords.length);
+      
+      // Avoid immediate word repetition
+      if (!usedIndices.has(randomIndex)) {
+        selectedWords.push(commonWords[randomIndex]);
+        usedIndices.add(randomIndex);
+        
+        // Reset usedIndices if we're running out of unique words
+        if (usedIndices.size === commonWords.length) {
+          usedIndices.clear();
+        }
+      }
+    }
+    
+    return selectedWords.join(" ");
+  };
   const generateRandomText = () => {
     setReset(true);
     setIsAnimating(true);
@@ -99,25 +126,18 @@ const Individual = () => {
     let selectedText = "";
     
     if (settings.type === "words") {
-      // Generate word-based text
       const wordCounts = {
-        short: 10,
-        medium: 25,
+        short: 15,
+        medium: 30,
         long: 50
       };
-      const count = wordCounts[settings.length];
-      const selectedWords: string[] = [];
-      for (let i = 0; i < count; i++) {
-      }
-      selectedText = selectedWords.join(" ");
+      selectedText = generateWordText({ count: wordCounts[settings.length] });
     } else {
-      // Get phrases from the correct length category
       const availablePhrases = phrases[settings.length];
       if (availablePhrases && availablePhrases.length > 0) {
         const randomIndex = Math.floor(Math.random() * availablePhrases.length);
         selectedText = availablePhrases[randomIndex];
       } else {
-        // Fallback if no phrases are available for the selected length
         selectedText = "No phrases available for the selected length.";
       }
     }
@@ -126,8 +146,9 @@ const Individual = () => {
       setRandomText(selectedText);
       setIsAnimating(false);
       setReset(false);
-    }, 300);
+    }, 500);
   };
+
 
 
   const { isSignedIn, user, isLoaded } = useUser();

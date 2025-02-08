@@ -9,6 +9,16 @@ import {
   AlertDialogAction,
 } from "@/components/ui/alert-dialog";
 import { Button } from './ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+
+const themes = {
+  dark: 'bg-gray-900',
+  blue: 'bg-blue-900',
+  green: 'bg-green-900',
+  purple: 'bg-purple-900'
+};
+
+type ThemeKey = keyof typeof themes;
 interface TypingStats {
   wpm: number;
   accuracy: number;
@@ -20,9 +30,10 @@ interface TypingCmpProps {
   playerId: string;
   counter: number;
   sampleText: string;
+  tozero: boolean;
 }
 
-const TypingCmpInd: React.FC<TypingCmpProps> = ({ playerId, counter, sampleText }) => {
+const TypingCmpInd: React.FC<TypingCmpProps> = ({ playerId, counter, sampleText,tozero }) => {
   const [userInput, setUserInput] = useState<string>("");
   const [startTime, setStartTime] = useState<number | null>(null);
   const [currentPosition, setCurrentPosition] = useState<number>(0);
@@ -37,6 +48,15 @@ const TypingCmpInd: React.FC<TypingCmpProps> = ({ playerId, counter, sampleText 
   });
 
   const textAreaRef = useRef<HTMLDivElement>(null);
+  const [currentTheme, setCurrentTheme] = useState<ThemeKey>('dark');
+
+  const handleReplay = (e: React.MouseEvent) => {
+    e.preventDefault(); // Prevent button from taking focus
+    reset();
+    // Ensure div regains focus
+    textAreaRef.current?.focus();
+  };
+
 
   useEffect(() => {
     if (textAreaRef.current) {
@@ -171,11 +191,17 @@ const TypingCmpInd: React.FC<TypingCmpProps> = ({ playerId, counter, sampleText 
     setStartTime(null);
     setStats({
       wpm: 0,
-      accuracy: 100,
+      accuracy: 0,
       errors: 0,
       totalTyped: 0,
     });
   }
+
+  useEffect(() => {
+    if (tozero) {
+      reset();
+    }
+  }, [tozero]);
   const saveStats = async () => {
     try {
       const response = await fetch('/api/typing-stats', {
@@ -200,26 +226,49 @@ const TypingCmpInd: React.FC<TypingCmpProps> = ({ playerId, counter, sampleText 
       console.error('Error saving stats:', error)
     }
   }
-
+  const handleThemeChange = (value: ThemeKey) => {
+    setCurrentTheme(value);
+    // Maintain focus after theme change
+    textAreaRef.current?.focus();
+  };
   return (
-    <div className="max-w-3xl mx-auto p-6 space-y-6">
+    <div className="max-w-3xl mx-auto px-6 space-y-6">
       <div className="stats flex justify-between mb-4 text-lg text-white">
-        <div>WPM: {stats.wpm}</div>
-        <div>Accuracy: {stats.accuracy}%</div>
-        <div>Errors: {currentErrors}</div>
+        <div>WPM: <b>{stats.wpm}</b></div>
+        <div>Accuracy: <b>{stats.accuracy}%</b></div>
+        <div>Errors: <b>{currentErrors}</b></div>
+      </div>
+
+      <div className="flex justify-center mb-4">
+        <Select value={currentTheme} onValueChange={handleThemeChange}>
+          <SelectTrigger className="w-[180px] text-white">
+            <SelectValue placeholder="Select theme" />
+          </SelectTrigger>
+          <SelectContent>
+            {Object.keys(themes).map((theme) => (
+              <SelectItem key={theme} value={theme}>
+                {theme.charAt(0).toUpperCase() + theme.slice(1)}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
 
       <div
         ref={textAreaRef}
         tabIndex={0}
         onKeyDown={counter > 0 ? undefined : handleKeyDown}
-        className="text-area p-4 bg-gray-900 rounded-lg font-mono text-lg leading-relaxed whitespace-pre-wrap focus:outline-none focus:ring-2 min-h-[200px] cursor-text"
-      >
+        className={`text-area p-4 ${themes[currentTheme]} rounded-lg font-mono text-lg leading-relaxed 
+          whitespace-pre-wrap focus:outline-none focus:ring-2 min-h-[200px] cursor-text
+         'text-slate-100'}`}>
         {renderText()}
         <span className="animate-pulse">|</span>
       </div>
       <div className='flex justify-center'>
-        <Button onClick={reset} className="bg-red-500 hover:bg-red-600 text-lg font-bold p-4 rounded-lg border"> 
+        <Button 
+          onClick={handleReplay}
+          className="bg-red-500 hover:bg-red-600 text-lg font-bold p-4 rounded-lg border"
+        > 
           Replay
         </Button>
       </div>

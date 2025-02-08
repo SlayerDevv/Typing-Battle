@@ -36,33 +36,33 @@ const IndividualRoom: React.FC = async () => {
     <div className="min-h-screen bg-[url('/bg.jpg')] bg-cover bg-center bg-fixed">
    
       <div className="min-h-screen backdrop-blur-sm bg-black/40">
+        <div className="container mx-auto pt-4">
+        <div className="">
+  <Card className="p-4 backdrop-blur-md bg-black/30 border-none shadow-2xl ">
+    <div className="flex items-center gap-4 text-white ">
     <Link
         href="/"
-        className="text-white bg-yellow-400 hover:bg-yellow-500 focus:ring-4 focus:ring-yellow-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-2 mb-2 relative top-4 left-6"
+        className="text-white bg-yellow-400 hover:bg-yellow-500 focus:ring-4 focus:ring-yellow-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center "
     >
         Return Home
     </Link>
-        <div className="container mx-auto px-4 py-8">
-          <div className="mb-8">
-            <Card className="p-6 backdrop-blur-md bg-black/30 border-none shadow-2xl">
-              <div className="flex flex-col items-center gap-4 text-white">
-                <img className="w-16 h-16 rounded-full" src={user?.imageUrl} alt="profile-image" />
-                <div className="text-center">
-                  <h1 className="text-3xl font-bold mb-2">
-                    Welcome back, {user?.firstName}!
-                  </h1>
-                  <p className="text-gray-200">
-                  Test your typing speed with random text challenges
-                  </p>
-                  <SignedIn>
-                  <UserButton />
-                  </SignedIn>
-                </div>
-              </div>
-            </Card>
-          </div>
+      <img className="w-12 h-12 rounded-full" src={user?.imageUrl} alt="profile-image" />
+      <div className="flex-1">
+        <h1 className="text-2xl font-bold">
+          Welcome back, {user?.firstName}!
+        </h1>
+        <p className="text-sm text-gray-200">
+          Test your typing speed with random text challenges
+        </p>
+      </div>
+      <SignedIn>
+        <UserButton />
+      </SignedIn>
+    </div>
+  </Card>
+</div>
           
-          <div className="mt-8">
+          <div className="mt-6">
             <Card className="backdrop-blur-md bg-black/30 border-none shadow-2xl">
               <Individual />
             </Card>

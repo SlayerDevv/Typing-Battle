@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 import { Button } from "../components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Keyboard, Loader2, Type, Settings } from "lucide-react";
+import { Keyboard, Loader2, Type } from "lucide-react";
 import { ClerkProvider } from "@clerk/nextjs";
 
 const Individual = () => {
@@ -108,8 +108,6 @@ const Individual = () => {
       const count = wordCounts[settings.length];
       const selectedWords: string[] = [];
       for (let i = 0; i < count; i++) {
-        const randomWord = words[Math.floor(Math.random() * words.length)];
-      const availablePhrases = phrases[settings.length as LengthType];
       }
       selectedText = selectedWords.join(" ");
     } else {
@@ -133,7 +131,7 @@ const Individual = () => {
 
 
   const { isSignedIn, user, isLoaded } = useUser();
-  const [mounted, setMounted] = useState(false);
+  const [, setMounted] = useState(false);
 
   useEffect(() => {
     setMounted(true);

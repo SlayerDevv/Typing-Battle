@@ -66,10 +66,11 @@ const IndividualRoom: React.FC = async () => {
                 </div>
   
                 <SignedOut>
-                  <div className="w-full flex justify-center group items-center gap-2 bg-yellow-400/5 hover:bg-yellow-400/10 text-yellow-400 px-6 py-3 rounded-xl transition-all duration-200 cursor-pointer backdrop-blur-md">
-                    <SignInButton />
-                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200" />
-                  </div>
+                <SignInButton>
+                  <button className="w-full flex justify-center group items-center gap-2 bg-yellow-400/5 hover:bg-yellow-400/10 text-yellow-400 px-6 py-3 rounded-xl transition-all duration-200 cursor-pointer backdrop-blur-md">
+                    Sign In
+                  </button> 
+                </SignInButton>
                 </SignedOut>
               </div>
             </Card>

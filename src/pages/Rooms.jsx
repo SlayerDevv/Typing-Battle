@@ -153,7 +153,13 @@ export default function RoomsPage() {
   };
 
   return (
-    <div className='min-h-screen flex flex-col items-center justify-center gap-16 bg-[url("/bg.jpg")] bg-cover bg-center'>
+    <div className='flex-col  gap-16 min-h-screen flex items-center justify-center relative bg-slate-900'>
+        
+       
+       <div className="absolute inset-0 backdrop-blur-5xl">
+       <div className="absolute inset-0 bg-[url('/bg.jpg')]  bg-cover bg-center opacity-20" />
+
+       </div>
       <div className="flex gap-16">
         {/* Create Room Card */}
         <Card className="w-full h-auto max-h-[500px] bg-purple-400 px-7 rounded-md bg-clip-padding backdrop-filter backdrop-blur-md bg-opacity-20 border border-gray-100">

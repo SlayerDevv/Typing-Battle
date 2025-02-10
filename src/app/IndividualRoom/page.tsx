@@ -78,7 +78,7 @@ const IndividualRoom: React.FC = async () => {
             {/* Practice card with increased blur */}
             <Card className="p-6 bg-black/20 backdrop-blur-xl border border-white/5 rounded-2xl shadow-xl transform hover:scale-105 transition-transform duration-300">
               <div className="flex flex-col items-center gap-4">
-                <div className="flex items-center gap-2 text-yellow-400">
+                <div className="flex items-center gap-2 text-white">
                   <Sparkles className="w-5 h-5" />
                   <span className="text-lg font-medium">Quick Start Option</span>
                 </div>
@@ -104,45 +104,46 @@ const IndividualRoom: React.FC = async () => {
   const user = await currentUser();
 
   return (
-    <div className="min-h-screen bg-[url('/bg.jpg')] bg-cover bg-center bg-fixed">
-   
-      <div className="min-h-screen backdrop-blur-sm bg-black/40">
-        <div className="container mx-auto pt-4">
-        <div className="">
-  <Card className="p-4 backdrop-blur-md bg-black/30 border-none shadow-2xl ">
-    <div className="flex items-center gap-4 text-white ">
-    <Link
-        href="/"
-        className="text-white bg-yellow-400 hover:bg-yellow-500 focus:ring-4 focus:ring-yellow-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center "
-    >
-        Return Home
-    </Link>
-      <img className="w-12 h-12 rounded-full" src={user?.imageUrl} alt="profile-image" />
-      <div className="flex-1">
-        <h1 className="text-2xl font-bold">
-          Welcome back, {user?.firstName}!
-        </h1>
-        <p className="text-sm text-gray-200">
-          Test your typing speed with random text challenges
-        </p>
-      </div>
-      <SignedIn>
-        <UserButton />
-      </SignedIn>
-    </div>
-  </Card>
-</div>
-          
-          <div className="mt-6">
-            <Card className="backdrop-blur-md bg-black/30 border-none shadow-2xl">
-              <Individual />
+    <div className="min-h-screen bg-cover bg-center bg-fixed bg-slate-900 relative">
+    {/* Background Blur Layer */}
+    <div className="absolute inset-0 backdrop-blur-3xl bg-black/50" />
+    <div className="absolute inset-0 bg-[url('/bg.jpg')] bg-cover bg-center opacity-20" />
+
+    {/* Content Container */}
+    <div className="relative min-h-screen flex flex-col px-6">
+        {/* Navbar (Welcome Card) */}
+        <Card className="w-full fixed top-0 left-0 z-50 p-6 backdrop-blur-lg bg-black/30 border-none shadow-2xl">
+            <div className="flex items-center gap-6 text-gray-300">
+                <Link
+                    href="/"
+                    className="text-white bg-yellow-400 hover:bg-yellow-500 focus:ring-4 focus:ring-yellow-300 font-medium rounded-lg text-sm px-5 py-2.5"
+                >
+                    Return Home
+                </Link>
+                <img className="w-14 h-14 rounded-full" src={user?.imageUrl} alt="profile-image" />
+                <div className="flex-1">
+                    <h1 className="text-2xl font-bold text-white">
+                        Welcome back, {user?.firstName}!
+                    </h1>
+                    <p className="text-sm text-gray-400">
+                        Test your typing speed with random text challenges
+                    </p>
+                </div>
+                <SignedIn>
+                    <UserButton />
+                </SignedIn>
+            </div>
+        </Card>
+
+        {/* Typing Challenge Card */}
+        <div className="flex justify-center items-center flex-grow pt-24">
+        <Card className="bg-black/30 w-full sm:w-4/5 md:w-3/4 lg:w-2/3 h-auto min-h-[400px] p-8">
+                <Individual />
             </Card>
-          </div>
         </div>
-      </div>
     </div>
+</div>
 
-  );
-};
-
+    );
+}
 export default IndividualRoom;

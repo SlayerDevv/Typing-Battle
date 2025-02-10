@@ -94,7 +94,7 @@ const IndividualPractice = () => {
 
   return (
       <div className="flex flex-col items-center gap-8">
-        <Card className="w-full max-w-4xl p-6 bg-black/40 backdrop-blur-sm border-none">
+        <Card className="w-full max-w-4xl p-6 bg-black/0 backdrop-blur-sm border-none">
           <div className="flex flex-col items-center gap-6">
             {/* Settings Panel */}
             <div className="flex gap-4 w-full max-w-md justify-center">

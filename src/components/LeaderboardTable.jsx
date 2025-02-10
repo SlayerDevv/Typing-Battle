@@ -1,6 +1,6 @@
 "use client"
 import React, { useEffect, useState } from 'react';
-import { Medal, Trophy, Crown, Award } from 'lucide-react';
+import { Medal, Crown, Award,Loader2 } from 'lucide-react';
 
 const LeaderboardTable = () => {
   const [scores, setScores] = useState([]);
@@ -58,12 +58,18 @@ const LeaderboardTable = () => {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-48">
-        <div className="text-lg text-gray-300">Loading leaderboard...</div>
+      <div className="fixed inset-0 z-50 flex justify-center items-center bg-black/15">
+        <div className="flex flex-col justify-center items-center space-y-6 p-8 rounded-xl ">
+          <Loader2 className="h-16 w-16 text-blue-600 animate-spin" />
+          <div className="text-2xl text-black font-bold tracking-wider">
+            Loading Leaderboard...
+          </div>
+        </div>
       </div>
     );
-  }
-
+  };
+  
+  
   if (error) {
     return (
       <div className="flex justify-center items-center h-48">

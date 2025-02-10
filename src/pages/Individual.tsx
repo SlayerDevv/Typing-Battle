@@ -12,9 +12,9 @@ import {commonWords} from "@/config/words"
 const Individual = () => {
   
 
-  type LengthType = 'short' | 'medium' | 'long';
+  type LengthType = 'medium' | 'long';
 
-  type TextType = 'words' | 'phrases';
+  type TextType =  'phrases';
 
   const [settings, setSettings] = useState<{
     type: TextType;
@@ -59,14 +59,7 @@ const Individual = () => {
     
     let selectedText = "";
     
-    if (settings.type === "words") {
-      const wordCounts = {
-        short: 15,
-        medium: 30,
-        long: 50
-      };
-      selectedText = generateWordText({ count: wordCounts[settings.length] });
-    } else {
+
       const availablePhrases = phrases[settings.length];
       if (availablePhrases && availablePhrases.length > 0) {
         const randomIndex = Math.floor(Math.random() * availablePhrases.length);
@@ -74,7 +67,7 @@ const Individual = () => {
       } else {
         selectedText = "No phrases available for the selected length.";
       }
-    }
+    
     
     setTimeout(() => {
       setRandomText(selectedText);
@@ -122,22 +115,11 @@ const Individual = () => {
   return (
     <ClerkProvider>
       <div className="flex flex-col items-center gap-8">
-        <Card className="w-full max-w-4xl p-6 bg-black/40 backdrop-blur-sm border-none">
+        <Card className="w-full max-w-4xl p-6 bg-black/8 backdrop-blur-sm border-none">
           <div className="flex flex-col items-center gap-6">
-            {/* Settings Panel */}
+           
             <div className="flex gap-4 w-full max-w-md justify-center">
-                <Select
-                value={settings.type}
-                onValueChange={(value: string) => setSettings(prev => ({ ...prev, type: value as 'words' | 'phrases' }))}
-                >
-                <SelectTrigger className="w-[180px] text-white">
-                  <SelectValue placeholder="Type" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="words">Words</SelectItem>
-                  <SelectItem value="phrases">Phrases</SelectItem>
-                </SelectContent>
-                </Select>
+                
 
                 <Select
                 value={settings.length}
@@ -147,7 +129,7 @@ const Individual = () => {
                   <SelectValue placeholder="Length" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="short">Short</SelectItem>
+                  
                   <SelectItem value="medium">Medium</SelectItem>
                   <SelectItem value="long">Long</SelectItem>
                 </SelectContent>

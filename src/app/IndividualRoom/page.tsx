@@ -49,7 +49,7 @@ const IndividualRoom: React.FC = async () => {
           
           <div className="lg:w-3/5 flex flex-col gap-6 w-full max-w-md">
             
-            <Card className="p-8 bg-black/30 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl transform hover:scale-105 transition-transform duration-300">
+            <Card className="p-8 bg-black/30 backdrop-blur-xl  rounded-2xl shadow-2xl transform hover:scale-105 transition-transform duration-300">
               <div className="flex flex-col items-center gap-6">
                 <div className="relative">
                   <div className="absolute inset-0 bg-yellow-400 rounded-full blur-2xl opacity-40 animate-pulse" />
@@ -76,7 +76,7 @@ const IndividualRoom: React.FC = async () => {
             </Card>
   
             {/* Practice card with increased blur */}
-            <Card className="p-6 bg-black/20 backdrop-blur-xl border border-white/5 rounded-2xl shadow-xl transform hover:scale-105 transition-transform duration-300">
+            <Card className="p-6 bg-black/20 backdrop-blur-xl  rounded-2xl shadow-xl transform hover:scale-105 transition-transform duration-300">
               <div className="flex flex-col items-center gap-4">
                 <div className="flex items-center gap-2 text-white">
                   <Sparkles className="w-5 h-5" />
@@ -123,7 +123,7 @@ const IndividualRoom: React.FC = async () => {
                 <img className="w-14 h-14 rounded-full" src={user?.imageUrl} alt="profile-image" />
                 <div className="flex-1">
                     <h1 className="text-2xl font-bold text-white">
-                        Welcome back, {user?.firstName}!
+                        Welcome back, {user?.firstName?? "Guest"}!
                     </h1>
                     <p className="text-sm text-gray-400">
                         Test your typing speed with random text challenges
@@ -137,7 +137,7 @@ const IndividualRoom: React.FC = async () => {
 
         {/* Typing Challenge Card */}
         <div className="flex justify-center items-center flex-grow pt-24">
-        <Card className="bg-black/30 w-full sm:w-4/5 md:w-3/4 lg:w-2/3 h-auto min-h-[400px] p-8">
+        <Card className="bg-black/30 w-full sm:w-4/5 md:w-3/4 lg:w-2/3 h-auto min-h-[400px] p-8 border-none">
                 <Individual />
             </Card>
         </div>

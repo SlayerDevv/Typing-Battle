@@ -1,3 +1,4 @@
+'use client'
 import { useEffect, useState } from "react"
 import {ClerkProvider, SignedOut, SignInButton, SignOutButton, useUser} from '@clerk/nextjs'
 import { KeyRound, Loader2 } from "lucide-react";

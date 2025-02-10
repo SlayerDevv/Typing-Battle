@@ -10,6 +10,7 @@ import {
   CardTitle,
 } from "../components/ui/card";
 import Profile from "@/components/Profile";
+import { ClerkProvider } from "@clerk/nextjs";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Alert, AlertDescription, AlertTitle } from "../components/ui/alert";
@@ -154,6 +155,7 @@ export default function RoomsPage() {
   };
 
   return (
+    <ClerkProvider>
     <div className='flex-col  gap-16 min-h-screen flex items-center justify-center relative bg-slate-900'>
         
        
@@ -273,5 +275,7 @@ export default function RoomsPage() {
     </div>
       
     </div>
+    </ClerkProvider>
+
   );
 }

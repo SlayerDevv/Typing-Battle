@@ -31,28 +31,6 @@ const Individual = () => {
     count: number;
   }
 
-  const generateWordText = ({ count }: GenerateWordTextParams): string => {
-    const selectedWords: string[] = [];
-    const usedIndices: Set<number> = new Set();
-    
-    // Keep selecting words until we reach the desired count
-    while (selectedWords.length < count) {
-      const randomIndex: number = Math.floor(Math.random() * commonWords.length);
-      
-      // Avoid immediate word repetition
-      if (!usedIndices.has(randomIndex)) {
-        selectedWords.push(commonWords[randomIndex]);
-        usedIndices.add(randomIndex);
-        
-        // Reset usedIndices if we're running out of unique words
-        if (usedIndices.size === commonWords.length) {
-          usedIndices.clear();
-        }
-      }
-    }
-    
-    return selectedWords.join(" ");
-  };
   const generateRandomText = () => {
     setReset(true);
     setIsAnimating(true);

@@ -164,11 +164,11 @@ export default function RoomsPage() {
       <div className="grid sm:grid-cols-1 md:grid-cols-3 max-sm:grid-cols-1 grid-cols-3 grid-flow-row gap-16">
         {/* Create Room Card */}
         <Profile />
-        <Card className="w-full h-auto max-h-[500px] bg-purple-400 px-2 rounded-md bg-clip-padding backdrop-filter backdrop-blur-md bg-opacity-20 border border-gray-100">
+        <Card className="px-6 bg-black/20 backdrop-blur-xl rounded-2xl shadow-xl transform hover:scale-105 transition-transform duration-300 border-0">
           <CardHeader>
             <CardTitle className="text-white text-xl">Create Room</CardTitle>
           </CardHeader>
-          <CardContent className="overflow-auto">
+          <CardContent className="overflow-auto p-0">
             <div className="space-y-[14px]">
               {error?.type === "CREATE" && error?.error.details[0].message ? (
                 <Alert className="bg-red-900 rounded-md bg-clip-padding backdrop-filter backdrop-blur-lg bg-opacity-40 border border-gray-100 text-red-400">
@@ -182,20 +182,20 @@ export default function RoomsPage() {
               )}
               <Input
                 placeholder="Player displayname"
-                className="bg-input"
+                className="bg-yellow-400/5 text-white placeholder:text-yellow-200/50 border-0 focus:ring-1 focus:ring-yellow-400/30"
                 onChange={(e) => {
                   setPlayerDisplayName(e.target.value), setError(null);
                 }}
               />
               <Input
                 placeholder="Room name"
-                className="bg-input"
+                className="bg-yellow-400/5 text-white placeholder:text-yellow-200/50 border-0 focus:ring-1 focus:ring-yellow-400/30"
                 onChange={(e) => {
                   setRoomName(e.target.value), setError(null);
                 }}
               />
               <Button
-                className="w-full bg-accent text-black hover:text-accent text-lg"
+                className="w-full group flex items-center justify-center gap-2 bg-yellow-400/5 hover:bg-yellow-400/10 text-yellow-400 rounded-xl transition-all duration-200 border-0"
                 onClick={handleCreateRoom}
               >
                 Create Room
@@ -206,11 +206,11 @@ export default function RoomsPage() {
         </Card>
 
         {/* Join Room Card */}
-        <Card className="w-full h-auto max-h-[500px] bg-purple-400 px-2 rounded-md bg-clip-padding backdrop-filter backdrop-blur-md bg-opacity-20 border border-gray-100">
+        <Card className="px-6 bg-black/20 backdrop-blur-xl rounded-2xl shadow-xl transform hover:scale-105 transition-transform duration-300 border-0">
           <CardHeader>
             <CardTitle className="text-white text-xl">Join Room</CardTitle>
           </CardHeader>
-          <CardContent className="overflow-auto">
+          <CardContent className="overflow-auto p-0">
             <div className="space-y-[14px]">
               {error?.type === "JOIN" && error?.error.details[0].message ? (
                 <Alert className="bg-red-900 rounded-md bg-clip-padding backdrop-filter backdrop-blur-lg bg-opacity-40 border border-gray-100 text-red-400">
@@ -224,20 +224,20 @@ export default function RoomsPage() {
               )}
               <Input
                 placeholder="Player displayname"
-                className="bg-input"
+                className="bg-yellow-400/5 text-white placeholder:text-yellow-200/50 border-0 focus:ring-1 focus:ring-yellow-400/30"
                 onChange={(e) => {
                   setPlayerDisplayName(e.target.value), setError(null);
                 }}
               />
               <Input
                 placeholder="Room ID / Room name"
-                className="bg-input"
+                className="bg-yellow-400/5 text-white placeholder:text-yellow-200/50 border-0 focus:ring-1 focus:ring-yellow-400/30"
                 onChange={(e) => {
                   setRoomName(e.target.value), setError(null);
                 }}
               />
               <Button
-                className="w-full bg-accent text-black hover:text-accent text-lg"
+                className="w-full group flex items-center justify-center gap-2 bg-yellow-400/5 hover:bg-yellow-400/10 text-yellow-400 rounded-xl transition-all duration-200 border-0"
                 onClick={handleJoinRoom}
               >
                 Join Room

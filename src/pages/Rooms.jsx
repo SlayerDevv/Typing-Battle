@@ -9,6 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from "../components/ui/card";
+import Profile from "@/components/Profile";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Alert, AlertDescription, AlertTitle } from "../components/ui/alert";
@@ -158,11 +159,12 @@ export default function RoomsPage() {
        
        <div className="absolute inset-0 backdrop-blur-5xl">
        <div className="absolute inset-0 bg-[url('/bg.jpg')]  bg-cover bg-center opacity-20" />
-
+       
        </div>
-      <div className="flex gap-16">
+      <div className="grid sm:grid-cols-1 md:grid-cols-3 max-sm:grid-cols-1 grid-cols-3 grid-flow-row gap-16">
         {/* Create Room Card */}
-        <Card className="w-full h-auto max-h-[500px] bg-purple-400 px-7 rounded-md bg-clip-padding backdrop-filter backdrop-blur-md bg-opacity-20 border border-gray-100">
+        <Profile />
+        <Card className="w-full h-auto max-h-[500px] bg-purple-400 px-2 rounded-md bg-clip-padding backdrop-filter backdrop-blur-md bg-opacity-20 border border-gray-100">
           <CardHeader>
             <CardTitle className="text-white text-xl">Create Room</CardTitle>
           </CardHeader>
@@ -204,7 +206,7 @@ export default function RoomsPage() {
         </Card>
 
         {/* Join Room Card */}
-        <Card className="w-full h-auto max-h-[500px] bg-purple-400 px-7 rounded-md bg-clip-padding backdrop-filter backdrop-blur-md bg-opacity-20 border border-gray-100">
+        <Card className="w-full h-auto max-h-[500px] bg-purple-400 px-2 rounded-md bg-clip-padding backdrop-filter backdrop-blur-md bg-opacity-20 border border-gray-100">
           <CardHeader>
             <CardTitle className="text-white text-xl">Join Room</CardTitle>
           </CardHeader>
@@ -246,8 +248,9 @@ export default function RoomsPage() {
         </Card>
       </div>
 
-
+      
        <div className="flex flex-col md:flex-row gap-14 w-full max-w-xl">
+        
       <Link href="/IndividualRoom" className="w-full">
         <Button className="w-full bg-gradient-to-br from-cyan-400 to-teal-500 hover:from-cyan-500 hover:to-teal-600 text-white text-xl py-8 px-6 rounded-2xl shadow-lg transform transition-all duration-300 hover:scale-105 hover:shadow-2xl border-2 border-cyan-200/30 group">
           <span className="flex items-center justify-center gap-4 font-semibold">

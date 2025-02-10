@@ -33,19 +33,21 @@ const calculateOverallScore = (stats) => {
   return Math.round(baseScore * 10) / 10;
 };
 
-export async function saveTypingStats(playerId, stats) {
-  const collection = await getCollection('typing-stats')
+export const collection = await getCollection('typing-stats')
+
+export async function saveTypingStats(playerId, userId, stats) {
   
   // Calculate overall score for new stats
   const newOverallScore = calculateOverallScore(stats)
   
   // Check if player exists
-  const existingStats = await collection.findOne({ playerId })
+  const existingStats = await collection.findOne({ userId })
   
   if (!existingStats) {
     // First time player - save stats with overall score
     return await collection.insertOne({
       playerId,
+      userId,
       wpm: stats.wpm,
       errors: stats.errors,
       accuracy: stats.accuracy,
@@ -61,9 +63,10 @@ export async function saveTypingStats(playerId, stats) {
   // Only update if new overall score is higher
   if (newOverallScore > existingOverallScore) {
     return await collection.updateOne(
-      { playerId },
+      { userId },
       {
         $set: {
+          playerId,
           wpm: stats.wpm,
           errors: stats.errors,
           accuracy: stats.accuracy,
@@ -73,6 +76,18 @@ export async function saveTypingStats(playerId, stats) {
       }
     )
   }
+
+  
   
   return null // No update needed
+}
+
+export async function updatePlayerId(userId, playerId){
+  await collection.updateOne({userId}, { $set: {
+    playerId
+  }})
+}
+
+export async function addUserId(playerId, userId){
+  await collection.updateOne({playerId}, { $set: {userId: userId}});
 }

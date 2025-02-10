@@ -10,7 +10,6 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from './ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-
 const themes = {
   dark: 'bg-gray-900',
   blue: 'bg-blue-900',
@@ -28,12 +27,13 @@ interface TypingStats {
 
 interface TypingCmpProps {
   playerId: string;
+  userId: string;
   counter: number;
   sampleText: string;
   tozero: boolean;
 }
 
-const TypingCmpInd: React.FC<TypingCmpProps> = ({ playerId, counter, sampleText,tozero }) => {
+const TypingCmpInd: React.FC<TypingCmpProps> = ({ playerId,userId, counter, sampleText,tozero }) => {
   const [userInput, setUserInput] = useState<string>("");
   const [startTime, setStartTime] = useState<number | null>(null);
   const [currentPosition, setCurrentPosition] = useState<number>(0);
@@ -211,6 +211,7 @@ const TypingCmpInd: React.FC<TypingCmpProps> = ({ playerId, counter, sampleText,
         },
         body: JSON.stringify({
           playerId,
+          userId,
           stats: {
             wpm: stats.wpm,
             errors: stats.errors,

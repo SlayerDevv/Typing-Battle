@@ -171,6 +171,7 @@ const Individual = () => {
 
             {randomText ? (
               <TypingCmpInd
+                userId={user.id}
                 playerId={user?.fullName || ""}
                 counter={0}
                 sampleText={randomText}

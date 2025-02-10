@@ -3,8 +3,8 @@ import { saveTypingStats } from '@/lib/db'
 import { getCollection } from '@/lib/db'
 export async function POST(request) {
   try {
-    const { playerId, stats } = await request.json()
-    const result = await saveTypingStats(playerId, stats)
+    const { playerId, userId,stats } = await request.json()
+    const result = await saveTypingStats(playerId, userId,stats)
     
     if (result === null) {
       return NextResponse.json({ message: 'No update needed' }, { status: 200 })

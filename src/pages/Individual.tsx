@@ -8,7 +8,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Keyboard, Loader2, Type } from "lucide-react";
 import { ClerkProvider } from "@clerk/nextjs";
 import {phrases} from "@/config/phrases"
-import {commonWords} from "@/config/words"
 const Individual = () => {
   
 
@@ -27,9 +26,7 @@ const Individual = () => {
   const [randomText, setRandomText] = useState("");
   const [isAnimating, setIsAnimating] = useState(false);
   const [reset, setReset] = useState(false);
-  interface GenerateWordTextParams {
-    count: number;
-  }
+
 
   const generateRandomText = () => {
     setReset(true);

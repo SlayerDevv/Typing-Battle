@@ -2,7 +2,7 @@ import React from "react";
 import { auth, currentUser } from "@clerk/nextjs/server";
 import Individual from "@/pages/Individual";
 import { Card } from "@/components/ui/card";
-import { KeyRound ,ArrowRight,ArrowLeft, Sparkles} from "lucide-react";
+import { KeyRound ,ArrowRight, Sparkles, ArrowLeft} from "lucide-react";
 
 import Link from "next/link";
 import {
@@ -114,8 +114,8 @@ const IndividualRoom: React.FC = async () => {
     <div className="relative min-h-screen flex flex-col px-6">
         {/* Navbar (Welcome Card) */}
         <Card className="w-full fixed top-0 left-0 z-50 p-6 backdrop-blur-lg bg-black/30 border-none shadow-2xl">
-  <div className="flex items-center gap-6 text-gray-300">
-  <Link
+      <div className="flex items-center gap-6 text-gray-300">
+        <Link
            href="/"
            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-none bg-yellow-400/5 text-yellow-400 hover:bg-yellow-400/20 hover:text-yellow-600 transition-all"
          >

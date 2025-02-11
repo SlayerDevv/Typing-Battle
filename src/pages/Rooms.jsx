@@ -9,7 +9,6 @@ import {
   CardHeader,
   CardTitle,
 } from "../components/ui/card";
-import Profile from "@/components/Profile";
 import { ClerkProvider } from "@clerk/nextjs";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
@@ -163,10 +162,9 @@ export default function RoomsPage() {
        <div className="absolute inset-0 bg-[url('/bg.jpg')]  bg-cover bg-center opacity-20" />
        
        </div>
-      <div className="grid sm:grid-cols-1 md:grid-cols-3 max-sm:grid-cols-1 grid-cols-3 grid-flow-row gap-16">
+      <div className="flex gap-16 w-full justify-center">
         {/* Create Room Card */}
-        <Profile />
-        <Card className="px-6 bg-black/20 backdrop-blur-xl rounded-2xl shadow-xl transform hover:scale-105 transition-transform duration-300 border-0">
+        <Card className="w-80 px-6 bg-black/20 backdrop-blur-xl rounded-2xl shadow-xl transform hover:scale-105 transition-transform duration-300 border-0">
           <CardHeader>
             <CardTitle className="text-white text-xl">Create Room</CardTitle>
           </CardHeader>
@@ -208,7 +206,7 @@ export default function RoomsPage() {
         </Card>
 
         {/* Join Room Card */}
-        <Card className="px-6 bg-black/20 backdrop-blur-xl rounded-2xl shadow-xl transform hover:scale-105 transition-transform duration-300 border-0">
+        <Card className="w-80 px-6 bg-black/20 backdrop-blur-xl rounded-2xl shadow-xl transform hover:scale-105 transition-transform duration-300 border-0">
           <CardHeader>
             <CardTitle className="text-white text-xl">Join Room</CardTitle>
           </CardHeader>

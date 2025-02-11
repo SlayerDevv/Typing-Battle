@@ -133,6 +133,7 @@ const Individual = () => {
                 counter={0}
                 sampleText={randomText}
                 tozero={reset}
+                practice={false}
               />
             ) : (
               <div className="text-center p-8 text-gray-400">

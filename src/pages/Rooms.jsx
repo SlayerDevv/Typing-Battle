@@ -186,6 +186,7 @@ export default function RoomsPage() {
                 onChange={(e) => {
                   setPlayerDisplayName(e.target.value), setError(null);
                 }}
+                required
               />
               <Input
                 placeholder="Room name"
@@ -193,6 +194,7 @@ export default function RoomsPage() {
                 onChange={(e) => {
                   setRoomName(e.target.value), setError(null);
                 }}
+                required
               />
               <Button
                 className="w-full group flex items-center justify-center gap-2 bg-yellow-400/5 hover:bg-yellow-400/10 text-yellow-400 rounded-xl transition-all duration-200 border-0"
@@ -228,6 +230,7 @@ export default function RoomsPage() {
                 onChange={(e) => {
                   setPlayerDisplayName(e.target.value), setError(null);
                 }}
+                required
               />
               <Input
                 placeholder="Room ID / Room name"
@@ -235,6 +238,7 @@ export default function RoomsPage() {
                 onChange={(e) => {
                   setRoomName(e.target.value), setError(null);
                 }}
+                required
               />
               <Button
                 className="w-full group flex items-center justify-center gap-2 bg-yellow-400/5 hover:bg-yellow-400/10 text-yellow-400 rounded-xl transition-all duration-200 border-0"

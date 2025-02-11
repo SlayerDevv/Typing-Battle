@@ -143,11 +143,12 @@ const IndividualPractice = () => {
 
             {randomText ? (
               <TypingCmpInd
-              userId="213"
+                userId="213"
                 playerId="John Doe"
                 counter={0}
                 sampleText={randomText}
                 tozero={reset}
+                practice={true}
               />
             ) : (
               <div className="text-center p-8 text-gray-400">

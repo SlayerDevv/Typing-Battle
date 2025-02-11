@@ -138,8 +138,8 @@ const TypingCmpInd: React.FC<TypingCmpProps> = ({ playerId,userId, counter, samp
     
       if (e.ctrlKey) {
         // Trim trailing spaces and find the last word
-        let newInput = userInput.trimEnd();
-        let lastSpaceIndex = newInput.lastIndexOf(" ");
+        const newInput = userInput.trimEnd();
+        const lastSpaceIndex = newInput.lastIndexOf(" ");
   
         if (lastSpaceIndex !== -1) {
           setUserInput(userInput.substring(0, lastSpaceIndex + 1)); // Keep the space before the word

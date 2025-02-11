@@ -6,6 +6,11 @@ import { Loader2,UserCog  } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
+interface FormData {
+    firstName: string;
+    lastName: string;
+    userName: string;
+  }
 const ProfileDropdown = () => {
   const [isOpen, setOpen] = useState(false);
   const [formData, setFormData] = useState({
@@ -17,12 +22,6 @@ const ProfileDropdown = () => {
   const { user } = useUser();
 
   const hasChanges = Object.values(formData).some(value => value.length > 0);
-
-  interface FormData {
-    firstName: string;
-    lastName: string;
-    userName: string;
-  }
 
   interface InputChangeEvent extends React.ChangeEvent<HTMLInputElement> {}
 

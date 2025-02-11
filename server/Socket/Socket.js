@@ -294,6 +294,24 @@ export const initializeSocket = (server) => {
         }
       }
     });
+
+    socket.on("changeText", ({ roomId, text }) => {
+      io.to(roomId).emit("textChanged", { newText: text });
+    });
+    socket.on("resetText", ({ roomId, text }) => {
+      // Find the room by roomId
+      let room = rooms.get(roomId);
+    
+      if (room) {
+       
+          room.ready=[],
+          room.status = "waiting";
+          room.newText = text;
+    
+        // Emit the updated room data to all players in the room
+        io.to(roomId).emit("roomData", room);
+      }
+    });
   });
 
   return io;

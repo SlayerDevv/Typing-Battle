@@ -160,6 +160,7 @@ export const initializeSocket = (server) => {
     
         // Emit the updated room data to all players in the room
         io.to(roomId).emit("roomData", room);
+        io.to(roomId).emit("gameReset");
       }
     });
 

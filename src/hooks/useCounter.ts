@@ -33,6 +33,7 @@ export const useCounter = (initialTime = 0) => {
   const toggleReset = () => {
     setIsRunning(false);
     setCounter(initialTime);  // Reset to initial time
+    
   };
 
   return { toggleStart, toggleStop, toggleReset, Counter, setCounter, isRunning, setIsRunning };

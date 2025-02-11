@@ -22,12 +22,18 @@ interface TypingCmpProps {
   playerId: string;
   counter: number;
   sampleText: string;
+ 
   
 }
 import { Socket } from "socket.io-client";
 
 
-const TypingCmp: React.FC<TypingCmpProps> = ({ socket, roomId, playerId, counter,sampleText}) => {
+
+
+
+const TypingCmp: React.FC<TypingCmpProps> = ({ socket, roomId, playerId, counter,sampleText }) => {
+
+  
   
   const [userInput, setUserInput] = useState<string>("");
   const [startTime, setStartTime] = useState<number | null>(null);
@@ -47,6 +53,7 @@ const TypingCmp: React.FC<TypingCmpProps> = ({ socket, roomId, playerId, counter
     accuracy: number;
     errors: number;
   } | null>(null);
+  
  
   const [currentText, setCurrentText] = useState<string>(sampleText);
   const textAreaRef = useRef<HTMLDivElement>(null);
@@ -56,6 +63,9 @@ const TypingCmp: React.FC<TypingCmpProps> = ({ socket, roomId, playerId, counter
       textAreaRef.current.focus();
     }
   }, []);
+
+  
+  
 
   useEffect(() => {
     socket.on("textChanged", ({ newText }: { newText: string }) => {
@@ -265,7 +275,7 @@ const TypingCmp: React.FC<TypingCmpProps> = ({ socket, roomId, playerId, counter
 
 
   const handleReset = () => {
-    // Reset all states to initial values
+  
     setUserInput("");
     setStartTime(null);
     setCurrentPosition(0);
@@ -299,6 +309,10 @@ const TypingCmp: React.FC<TypingCmpProps> = ({ socket, roomId, playerId, counter
       playerId,
     });
   };
+
+
+
+ 
   const textOptions = [
     "The quick brown fox jumps over the lazy dog. Programming is the art of telling another human what one wants the computer to do.",
     "In the world of coding, every semicolon matters. A single character can make the difference between a working program and a syntax error that keeps you debugging for hours.",

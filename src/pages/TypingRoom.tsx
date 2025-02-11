@@ -60,6 +60,7 @@ export default function TypingRoom() {
   const {
     toggleStart: startPreparationTimer,
     Counter: preparationTime,
+    toggleReset:resetTypingTimer,
   } = useCounter(5);
 
   
@@ -108,6 +109,21 @@ export default function TypingRoom() {
   ];
   
   const sampleText = textOptions[Math.floor(Math.random() * textOptions.length)];
+
+  useEffect(() => {
+    if (
+      (RoomData?.players.length ?? 0) >= 2 &&
+      (RoomData?.ready.length ?? 0) >= 2 &&
+      RoomData?.status === "running"
+    ) {
+      // Reset preparation timer first
+      resetTypingTimer(); // Add this line
+      // Then start the timer with a slight delay
+      setTimeout(() => {
+        startPreparationTimer();
+      }, 1000);
+    }
+  }, [RoomData?.players.length, RoomData?.ready.length, RoomData?.status]);
 
   useEffect(() => {
     const roomId = localStorage.getItem("roomId");
@@ -183,15 +199,17 @@ export default function TypingRoom() {
       localStorage.setItem("roomId", updatedRoomId);
     });
 
-    if (
-      (RoomData?.players.length ?? 0) >= 2 &&
-      (RoomData?.ready.length ?? 0) >= 2 &&
-      RoomData?.status === "running"
-    ) {
-      setTimeout(() => {
-        startPreparationTimer();
-      }, 2000);
-    }
+    socket.on("gameReset", () => {
+      // Reset all necessary states
+      resetTypingTimer();
+      setRoomData(prev => ({
+        ...prev!,
+        ready: [],
+        status: "waiting"
+      }));
+    });
+
+    
     
 
     socket.on("playerStats", ({ playerId: statsPlayerId, playerName: statsPlayerName, stats }) => {
@@ -209,6 +227,7 @@ export default function TypingRoom() {
       socket.off("roomCreated");
       socket.off("playerStats");
       socket.off("playerReady");
+      socket.off("gameReset");
 
     };
 
@@ -308,6 +327,7 @@ export default function TypingRoom() {
                 playerId={playerId!}
                 counter={preparationTime}
                 sampleText={RoomData.text}
+                
               />
             </div>
           ) : (

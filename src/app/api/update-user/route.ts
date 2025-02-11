@@ -1,12 +1,12 @@
 import {NextRequest, NextResponse} from "next/server"
 import {clerkClient} from "@clerk/nextjs/server"
-import {updatePlayerId, addUserId, collection} from "@/lib/db" 
+import {updatePlayerId} from "@/lib/db" 
 type Data = {
     username?: string;
     firstName?: string;
     lastName?: string;
 }
-export async function POST(req: NextRequest,res: NextResponse){
+export async function POST(req: NextRequest){
     const {userId, username,firstName, lastName} = await req.json();
     const client = await clerkClient();
     const data: Data = {};
@@ -21,7 +21,7 @@ export async function POST(req: NextRequest,res: NextResponse){
         }
         
     }catch (err){
-        return NextResponse.json({error: 'Failed to update user'}, {status: 500})
+        return NextResponse.json({error: `Failed to update user : ${err}`}, {status: 500})
     }
 
 }

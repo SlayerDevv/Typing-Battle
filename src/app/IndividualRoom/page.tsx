@@ -2,7 +2,7 @@ import React from "react";
 import { auth, currentUser } from "@clerk/nextjs/server";
 import Individual from "@/pages/Individual";
 import { Card } from "@/components/ui/card";
-import { KeyRound ,ArrowRight, Sparkles} from "lucide-react";
+import { KeyRound ,ArrowRight,ArrowLeft, Sparkles} from "lucide-react";
 
 import Link from "next/link";
 import {
@@ -11,6 +11,7 @@ import {
     SignedOut,
     UserButton
   } from '@clerk/nextjs'
+import ProfileDropdown from "@/components/Profile";
 const IndividualRoom: React.FC = async () => {
   const { userId } = await auth();
 
@@ -113,27 +114,28 @@ const IndividualRoom: React.FC = async () => {
     <div className="relative min-h-screen flex flex-col px-6">
         {/* Navbar (Welcome Card) */}
         <Card className="w-full fixed top-0 left-0 z-50 p-6 backdrop-blur-lg bg-black/30 border-none shadow-2xl">
-            <div className="flex items-center gap-6 text-gray-300">
-                <Link
-                    href="/"
-                    className="text-white bg-yellow-400 hover:bg-yellow-500 focus:ring-4 focus:ring-yellow-300 font-medium rounded-lg text-sm px-5 py-2.5"
-                >
-                    Return Home
-                </Link>
-                <img className="w-14 h-14 rounded-full" src={user?.imageUrl} alt="profile-image" />
-                <div className="flex-1">
-                    <h1 className="text-2xl font-bold text-white">
-                        Welcome back, {user?.firstName?? "Guest"}!
-                    </h1>
-                    <p className="text-sm text-gray-400">
-                        Test your typing speed with random text challenges
-                    </p>
-                </div>
-                <SignedIn>
-                    <UserButton />
-                </SignedIn>
-            </div>
-        </Card>
+  <div className="flex items-center gap-6 text-gray-300">
+  <Link
+           href="/"
+           className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-none bg-yellow-400/5 text-yellow-400 hover:bg-yellow-400/20 hover:text-yellow-600 transition-all"
+         >
+            <ArrowLeft size={20} />
+          Return Home
+        </Link>
+    <div className="flex-1">
+      <h1 className="text-2xl font-bold text-white">
+        Welcome back, {user?.firstName ?? "Imposter"}!
+      </h1>
+      <p className="text-sm text-gray-400">
+        Test your typing speed with random text challenges
+      </p>
+    </div>
+    <ProfileDropdown />
+    <SignedIn>
+      <UserButton />
+    </SignedIn>
+  </div>
+</Card>
 
         {/* Typing Challenge Card */}
         <div className="flex justify-center items-center flex-grow pt-24">

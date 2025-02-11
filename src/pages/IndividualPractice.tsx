@@ -143,6 +143,7 @@ const IndividualPractice = () => {
 
             {randomText ? (
               <TypingCmpInd
+              userId="213"
                 playerId="John Doe"
                 counter={0}
                 sampleText={randomText}

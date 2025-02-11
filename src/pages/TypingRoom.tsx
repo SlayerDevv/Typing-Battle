@@ -60,7 +60,7 @@ export default function TypingRoom() {
   const {
     toggleStart: startPreparationTimer,
     Counter: preparationTime,
-  } = useCounter(10); 
+  } = useCounter(5);
 
   
   // const {
@@ -217,6 +217,12 @@ export default function TypingRoom() {
     RoomData?.ready.length,   
     RoomData?.status ,  
     RoomData?.text]);
+
+    useEffect(()=>{
+      if(RoomData?.status === "running"){
+        startPreparationTimer();
+      }
+    },[RoomData?.status,socket ]);
 
   if (!RoomData) {
     return (

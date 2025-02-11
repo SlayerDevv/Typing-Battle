@@ -48,7 +48,7 @@ const TypingCmp: React.FC<TypingCmpProps> = ({ socket, roomId, playerId, counter
     errors: number;
   } | null>(null);
  
-
+  const [currentText, setCurrentText] = useState<string>(sampleText);
   const textAreaRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -56,6 +56,40 @@ const TypingCmp: React.FC<TypingCmpProps> = ({ socket, roomId, playerId, counter
       textAreaRef.current.focus();
     }
   }, []);
+
+  useEffect(() => {
+    socket.on("textChanged", ({ newText }: { newText: string }) => {
+      setCurrentText(newText);
+      setUserInput("");
+    setStartTime(null);
+    setCurrentPosition(0);
+    setCurrentErrors(0);
+    setIsCompleted(false);
+    setStats({
+      wpm: 0,
+      accuracy: 100,
+      errors: 0,
+      totalTyped: 0,
+    });
+    setOpponentStats(
+      opponentStats ? {
+        ...opponentStats,
+        wpm: 0,
+        accuracy: 100,
+        errors: 0,
+      } : null
+    );
+  
+    // Focus back on the text area
+    if (textAreaRef.current) {
+      textAreaRef.current.focus();
+    }
+    });
+    return () => {
+      socket.off("textChanged");
+    };
+  }, [socket]);
+  
 
   useEffect(() => {
     // Only set up the player stats listener once
@@ -76,7 +110,7 @@ const TypingCmp: React.FC<TypingCmpProps> = ({ socket, roomId, playerId, counter
   
   // Third useEffect - check completion
   useEffect(() => {
-    if (userInput.length === sampleText.length ) {
+    if (userInput.length === currentText.length ) {
       setIsCompleted(true);
       socket.emit('raceCompleted', {
         roomId,
@@ -84,23 +118,8 @@ const TypingCmp: React.FC<TypingCmpProps> = ({ socket, roomId, playerId, counter
         stats
       });
     }
-  }, [userInput, sampleText, roomId, playerId, stats,socket,opponentStats]);
+  }, [userInput, currentText, roomId, playerId, stats,socket,opponentStats]);
  
-
-  // useEffect(() => {
-  //   socket.on("allPlayersFinished", () => {
-  //     stopTypingTimer();
-  //   });
-  
-  //   return () => {
-  //     socket.off("allPlayersFinished");
-  //   };
-  // }, [socket, stopTypingTimer]);
-
- 
-
-
-
   const calculateStats = () => {
     if (!startTime) {
       setStartTime(Date.now());
@@ -112,7 +131,7 @@ const TypingCmp: React.FC<TypingCmpProps> = ({ socket, roomId, playerId, counter
     const wpm = Math.round(wordsTyped / timeElapsed) || 0;
 
     const currentErrorCount = Array.from(userInput).reduce((count, char, index) => {
-      return count + (char !== sampleText[index] ? 1 : 0);
+      return count + (char !== currentText[index] ? 1 : 0);
     }, 0);
 
     setCurrentErrors(currentErrorCount);
@@ -171,7 +190,7 @@ const TypingCmp: React.FC<TypingCmpProps> = ({ socket, roomId, playerId, counter
         calculateStats();
         playSound('correct');
       }
-    } else if (e.key.length === 1 && userInput.length < sampleText.length) {
+    } else if (e.key.length === 1 && userInput.length < currentText.length) {
       const newInput = userInput + e.key;
       setUserInput(newInput);
       setCurrentPosition(newInput.length);
@@ -179,7 +198,7 @@ const TypingCmp: React.FC<TypingCmpProps> = ({ socket, roomId, playerId, counter
       // Determine which sound to play
       if (e.key === ' ') {
         playSound('space');
-      } else if (e.key === sampleText[userInput.length]) {
+      } else if (e.key === currentText[userInput.length]) {
         playSound('correct');
       } else {
         playSound('error');
@@ -190,7 +209,7 @@ const TypingCmp: React.FC<TypingCmpProps> = ({ socket, roomId, playerId, counter
   const renderText = () => {
     return (
       <>
-        {Array.from(sampleText).map((char, index) => {
+        {Array.from(currentText).map((char, index) => {
           let charClass = "text-gray-400";
           
           if (index < userInput.length) {
@@ -266,6 +285,52 @@ const TypingCmp: React.FC<TypingCmpProps> = ({ socket, roomId, playerId, counter
       playerId,
     });
   };
+  const textOptions = [
+    "The quick brown fox jumps over the lazy dog. Programming is the art of telling another human what one wants the computer to do.",
+    "In the world of coding, every semicolon matters. A single character can make the difference between a working program and a syntax error that keeps you debugging for hours.",
+    "Technology has revolutionized the way we live, work, and connect with others. As we continue to innovate, the possibilities seem endless in this digital age.",
+    "Software development is like building a house. You need a solid foundation, careful planning, and attention to detail. Testing ensures your structure won't collapse.",
+    "The best code is not just functional but also readable and maintainable. Clean code reads like well-written prose and tells a story about its purpose.",
+    "Artificial intelligence and machine learning are transforming industries across the globe. The future holds endless possibilities for those who embrace these technologies.",
+    "Great developers write code that humans can understand. Documentation is not just helpful; it's essential for maintaining and scaling software projects effectively.",
+    "Version control is like a time machine for your code. Git allows developers to experiment freely, knowing they can always return to a working state if needed.",
+    "The internet is a vast network connecting billions of devices worldwide. Every click, every search, and every message travels through this intricate web of connections.",
+    "Security in software development is not an afterthought but a fundamental requirement. Every line of code must be written with potential vulnerabilities in mind."
+  ];
+  
+
+  const handleChangeText = () => {
+    const newText = textOptions[Math.floor(Math.random() * textOptions.length)];
+    setCurrentText(newText);
+    setUserInput("");
+    setStartTime(null);
+    setCurrentPosition(0);
+    setCurrentErrors(0);
+    setIsCompleted(false);
+    setStats({
+      wpm: 0,
+      accuracy: 100,
+      errors: 0,
+      totalTyped: 0,
+    });
+    setOpponentStats(
+      opponentStats ? {
+        ...opponentStats,
+        wpm: 0,
+        accuracy: 100,
+        errors: 0,
+      } : null
+    );
+  
+    // Focus back on the text area
+    if (textAreaRef.current) {
+      textAreaRef.current.focus();
+    }
+
+    socket.emit("resetText", { roomId, text: newText });
+    socket.emit("changeText", { roomId, text: newText });
+  }
+
 
   return (
     <div className="max-w-3xl mx-auto p-6 space-y-6">
@@ -347,7 +412,13 @@ const TypingCmp: React.FC<TypingCmpProps> = ({ socket, roomId, playerId, counter
                 onClick={handleReset}
                     className="px-4 py-2 bg-purple-600 w-1/2 hover:bg-purple-700 text-white rounded-lg transition-colors"
                   >
-                    Reset Game
+                    Restart Game
+              </AlertDialogAction>
+              <AlertDialogAction
+                onClick={handleChangeText}
+                    className="px-4 py-2 bg-blue-600 w-1/2 hover:bg-blue-700 text-white rounded-lg transition-colors"
+                  >
+                    Change text and restart
               </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

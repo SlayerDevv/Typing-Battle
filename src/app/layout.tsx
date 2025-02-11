@@ -26,7 +26,7 @@ export const metadata: Metadata = {
     siteName: "Typing Speed Battle",
     images: [
       {
-        url: "https://typing-battle-six.vercel.app/assets/Screenshot 2025-02-09 185259.png", // Use your public image path
+        url: "https://typing-battle-six.vercel.app/assets/Screenshot 2025-02-11 220448png", // Use your public image path
         width: 1200,
         height: 630,
         alt: "Typing Battle Preview",

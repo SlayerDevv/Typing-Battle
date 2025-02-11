@@ -23,9 +23,8 @@ const ProfileDropdown = () => {
 
   const hasChanges = Object.values(formData).some(value => value.length > 0);
 
-  interface InputChangeEvent extends React.ChangeEvent<HTMLInputElement> {}
 
-  const handleInputChange = (e: InputChangeEvent) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData((prev: FormData) => ({
       ...prev,
       [e.target.name]: e.target.value

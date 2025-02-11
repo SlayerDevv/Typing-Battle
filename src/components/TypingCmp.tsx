@@ -184,12 +184,26 @@ const TypingCmp: React.FC<TypingCmpProps> = ({ socket, roomId, playerId, counter
     }
 
     if (e.key === 'Backspace') {
+      if (e.ctrlKey) {
+        // Trim trailing spaces and find the last word
+        let newInput = userInput.trimEnd();
+        let lastSpaceIndex = newInput.lastIndexOf(" ");
+  
+        if (lastSpaceIndex !== -1) {
+          setUserInput(userInput.substring(0, lastSpaceIndex + 1)); // Keep the space before the word
+          setCurrentPosition(lastSpaceIndex + 1);
+        } else {
+          setUserInput(""); // If no space exists, clear everything
+          setCurrentPosition(0);
+        }
+    } else {
       if (userInput.length > 0) {
         setUserInput(prev => prev.slice(0, -1));
         setCurrentPosition(prev => prev - 1);
-        calculateStats();
-        playSound('correct');
       }
+    }
+    calculateStats();
+    playSound('correct');
     } else if (e.key.length === 1 && userInput.length < currentText.length) {
       const newInput = userInput + e.key;
       setUserInput(newInput);

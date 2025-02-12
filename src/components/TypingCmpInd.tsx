@@ -31,9 +31,10 @@ interface TypingCmpProps {
   counter: number;
   sampleText: string;
   tozero: boolean;
+  practice: boolean
 }
 
-const TypingCmpInd: React.FC<TypingCmpProps> = ({ playerId,userId, counter, sampleText,tozero }) => {
+const TypingCmpInd: React.FC<TypingCmpProps> = ({ playerId,userId, counter, sampleText,tozero,practice }) => {
   const [userInput, setUserInput] = useState<string>("");
   const [startTime, setStartTime] = useState<number | null>(null);
   const [currentPosition, setCurrentPosition] = useState<number>(0);
@@ -67,7 +68,10 @@ const TypingCmpInd: React.FC<TypingCmpProps> = ({ playerId,userId, counter, samp
   useEffect(() => {
     if (userInput.length === sampleText.length) {
       setIsCompleted(true);
-      saveStats()
+      if (practice === false){
+          saveStats()
+      }
+     
     }
   }, [userInput, sampleText]);
 
@@ -213,6 +217,7 @@ const TypingCmpInd: React.FC<TypingCmpProps> = ({ playerId,userId, counter, samp
       errors: 0,
       totalTyped: 0,
     });
+    textAreaRef.current?.focus();
   }
 
   useEffect(() => {

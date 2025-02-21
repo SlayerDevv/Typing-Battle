@@ -9,6 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from "../components/ui/card";
+import Footer from "@/components/Footer";
 import { ClerkProvider } from "@clerk/nextjs";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
@@ -155,129 +156,132 @@ export default function RoomsPage() {
 
   return (
     <ClerkProvider>
-    <div className='flex-col  gap-16 min-h-screen flex items-center justify-center relative bg-slate-900'>
+      <div className='min-h-screen flex flex-col bg-slate-900'>
+        <div className="absolute inset-0 backdrop-blur-5xl">
+          <div className="absolute inset-0 bg-[url('/bg.jpg')] bg-cover bg-center opacity-20" />
+        </div>
         
-       
-       <div className="absolute inset-0 backdrop-blur-5xl">
-       <div className="absolute inset-0 bg-[url('/bg.jpg')]  bg-cover bg-center opacity-20" />
-       
-       </div>
-      <div className="flex gap-16 w-full justify-center">
-        {/* Create Room Card */}
-        <Card className="w-80 px-6 bg-black/20 backdrop-blur-xl rounded-2xl shadow-xl transform hover:scale-105 transition-transform duration-300 border-0">
-          <CardHeader>
-            <CardTitle className="text-white text-xl">Create Room</CardTitle>
-          </CardHeader>
-          <CardContent className="overflow-auto p-0">
-            <div className="space-y-[14px]">
-              {error?.type === "CREATE" && error?.error.details[0].message ? (
-                <Alert className="bg-red-900 rounded-md bg-clip-padding backdrop-filter backdrop-blur-lg bg-opacity-40 border border-gray-100 text-red-400">
-                  <AlertTitle>Oopsie!!</AlertTitle>
-                  <AlertDescription>
-                    {error?.error.details[0].message}
-                  </AlertDescription>
-                </Alert>
-              ) : (
-                ""
-              )}
-              <Input
-                placeholder="Player displayname"
-                className="bg-yellow-400/5 text-white placeholder:text-yellow-200/50 border-0 focus:ring-1 focus:ring-yellow-400/30"
-                onChange={(e) => {
-                  setPlayerDisplayName(e.target.value), setError(null);
-                }}
-                required
-              />
-              <Input
-                placeholder="Room name"
-                className="bg-yellow-400/5 text-white placeholder:text-yellow-200/50 border-0 focus:ring-1 focus:ring-yellow-400/30"
-                onChange={(e) => {
-                  setRoomName(e.target.value), setError(null);
-                }}
-                required
-              />
-              <Button
-                className="w-full group flex items-center justify-center gap-2 bg-yellow-400/5 hover:bg-yellow-400/10 text-yellow-400 rounded-xl transition-all duration-200 border-0"
-                onClick={handleCreateRoom}
-              >
-                Create Room
-              </Button>
-            </div>
-          </CardContent>
-          <CardFooter></CardFooter>
-        </Card>
+        {/* Main content wrapper with flex-grow to push footer down */}
+        <div className="flex-grow flex flex-col items-center justify-center gap-12 py-8">
+          {/* Cards grid */}
+          <div className="flex flex-wrap gap-16 w-full justify-center">
+            {/* Create Room Card */}
+            <Card className="w-80 px-6 bg-black/20 backdrop-blur-xl rounded-2xl shadow-xl transform hover:scale-105 transition-transform duration-300 border-0">
+              {/* Card content remains the same */}
+              <CardHeader>
+                <CardTitle className="text-white text-xl">Create Room</CardTitle>
+              </CardHeader>
+              <CardContent className="overflow-auto p-0">
+                <div className="space-y-[14px]">
+                  {error?.type === "CREATE" && error?.error.details[0].message ? (
+                    <Alert className="bg-red-900 rounded-md bg-clip-padding backdrop-filter backdrop-blur-lg bg-opacity-40 border border-gray-100 text-red-400">
+                      <AlertTitle>Oopsie!!</AlertTitle>
+                      <AlertDescription>
+                        {error?.error.details[0].message}
+                      </AlertDescription>
+                    </Alert>
+                  ) : (
+                    ""
+                  )}
+                  <Input
+                    placeholder="Player displayname"
+                    className="bg-yellow-400/5 text-white placeholder:text-yellow-200/50 border-0 focus:ring-1 focus:ring-yellow-400/30"
+                    onChange={(e) => {
+                      setPlayerDisplayName(e.target.value), setError(null);
+                    }}
+                    required
+                  />
+                  <Input
+                    placeholder="Room name"
+                    className="bg-yellow-400/5 text-white placeholder:text-yellow-200/50 border-0 focus:ring-1 focus:ring-yellow-400/30"
+                    onChange={(e) => {
+                      setRoomName(e.target.value), setError(null);
+                    }}
+                    required
+                  />
+                  <Button
+                    className="w-full group flex items-center justify-center gap-2 bg-yellow-400/5 hover:bg-yellow-400/10 text-yellow-400 rounded-xl transition-all duration-200 border-0"
+                    onClick={handleCreateRoom}
+                  >
+                    Create Room
+                  </Button>
+                </div>
+              </CardContent>
+              <CardFooter></CardFooter>
+            </Card>
 
-        {/* Join Room Card */}
-        <Card className="w-80 px-6 bg-black/20 backdrop-blur-xl rounded-2xl shadow-xl transform hover:scale-105 transition-transform duration-300 border-0">
-          <CardHeader>
-            <CardTitle className="text-white text-xl">Join Room</CardTitle>
-          </CardHeader>
-          <CardContent className="overflow-auto p-0">
-            <div className="space-y-[14px]">
-              {error?.type === "JOIN" && error?.error.details[0].message ? (
-                <Alert className="bg-red-900 rounded-md bg-clip-padding backdrop-filter backdrop-blur-lg bg-opacity-40 border border-gray-100 text-red-400">
-                  <AlertTitle>Oopsie!!</AlertTitle>
-                  <AlertDescription>
-                    {error?.error.details[0].message}
-                  </AlertDescription>
-                </Alert>
-              ) : (
-                ""
-              )}
-              <Input
-                placeholder="Player displayname"
-                className="bg-yellow-400/5 text-white placeholder:text-yellow-200/50 border-0 focus:ring-1 focus:ring-yellow-400/30"
-                onChange={(e) => {
-                  setPlayerDisplayName(e.target.value), setError(null);
-                }}
-                required
-              />
-              <Input
-                placeholder="Room ID / Room name"
-                className="bg-yellow-400/5 text-white placeholder:text-yellow-200/50 border-0 focus:ring-1 focus:ring-yellow-400/30"
-                onChange={(e) => {
-                  setRoomName(e.target.value), setError(null);
-                }}
-                required
-              />
-              <Button
-                className="w-full group flex items-center justify-center gap-2 bg-yellow-400/5 hover:bg-yellow-400/10 text-yellow-400 rounded-xl transition-all duration-200 border-0"
-                onClick={handleJoinRoom}
-              >
-                Join Room
+            {/* Join Room Card */}
+            <Card className="w-80 px-6 bg-black/20 backdrop-blur-xl rounded-2xl shadow-xl transform hover:scale-105 transition-transform duration-300 border-0">
+              <CardHeader>
+                <CardTitle className="text-white text-xl">Join Room</CardTitle>
+              </CardHeader>
+              <CardContent className="overflow-auto p-0">
+                <div className="space-y-[14px]">
+                  {error?.type === "JOIN" && error?.error.details[0].message ? (
+                    <Alert className="bg-red-900 rounded-md bg-clip-padding backdrop-filter backdrop-blur-lg bg-opacity-40 border border-gray-100 text-red-400">
+                      <AlertTitle>Oopsie!!</AlertTitle>
+                      <AlertDescription>
+                        {error?.error.details[0].message}
+                      </AlertDescription>
+                    </Alert>
+                  ) : (
+                    ""
+                  )}
+                  <Input
+                    placeholder="Player displayname"
+                    className="bg-yellow-400/5 text-white placeholder:text-yellow-200/50 border-0 focus:ring-1 focus:ring-yellow-400/30"
+                    onChange={(e) => {
+                      setPlayerDisplayName(e.target.value), setError(null);
+                    }}
+                    required
+                  />
+                  <Input
+                    placeholder="Room ID / Room name"
+                    className="bg-yellow-400/5 text-white placeholder:text-yellow-200/50 border-0 focus:ring-1 focus:ring-yellow-400/30"
+                    onChange={(e) => {
+                      setRoomName(e.target.value), setError(null);
+                    }}
+                    required
+                  />
+                  <Button
+                    className="w-full group flex items-center justify-center gap-2 bg-yellow-400/5 hover:bg-yellow-400/10 text-yellow-400 rounded-xl transition-all duration-200 border-0"
+                    onClick={handleJoinRoom}
+                  >
+                    Join Room
+                  </Button>
+                </div>
+              </CardContent>
+              <CardFooter></CardFooter>
+            </Card>
+          </div>
+
+          {/* Buttons section */}
+          <div className="flex flex-col md:flex-row gap-14 w-10/12 max-w-xl">
+            <Link href="/IndividualRoom" className="w-full">
+              <Button className="w-full bg-gradient-to-br from-cyan-400 to-teal-500 hover:from-cyan-500 hover:to-teal-600 text-white text-xl py-8 px-6 rounded-2xl shadow-lg transform transition-all duration-300 hover:scale-105 hover:shadow-2xl border-2 border-cyan-200/30 group">
+                <span className="flex items-center justify-center gap-4 font-semibold">
+                  <span className="text-3xl group-hover:animate-bounce">🎮</span>
+                  Play Alone
+                  <span className="text-3xl group-hover:animate-bounce">🚀</span>
+                </span>
               </Button>
-            </div>
-          </CardContent>
-          <CardFooter></CardFooter>
-        </Card>
+            </Link>
+            
+            <Link href="/Leaderboard" className="w-full">
+              <Button className="w-full bg-gradient-to-br from-pink-400 to-rose-500 hover:from-pink-500 hover:to-rose-600 text-white text-xl py-8 px-6 rounded-2xl shadow-lg transform transition-all duration-300 hover:scale-105 hover:shadow-2xl border-2 border-pink-200/30 group">
+                <span className="flex items-center justify-center gap-4 font-semibold">
+                  <span className="text-3xl group-hover:animate-bounce">🏆</span>
+                  Leaderboard
+                  <span className="text-3xl group-hover:animate-bounce">👑</span>
+                </span>
+              </Button>
+            </Link>
+          </div>
+        </div>
+
+      
+          <Footer />
       </div>
-
-      
-       <div className="flex flex-col md:flex-row gap-14 w-full max-w-xl">
-        
-      <Link href="/IndividualRoom" className="w-full">
-        <Button className="w-full bg-gradient-to-br from-cyan-400 to-teal-500 hover:from-cyan-500 hover:to-teal-600 text-white text-xl py-8 px-6 rounded-2xl shadow-lg transform transition-all duration-300 hover:scale-105 hover:shadow-2xl border-2 border-cyan-200/30 group">
-          <span className="flex items-center justify-center gap-4 font-semibold">
-            <span className="text-3xl group-hover:animate-bounce">🎮</span>
-            Play Alone
-            <span className="text-3xl group-hover:animate-bounce">🚀</span>
-          </span>
-        </Button>
-      </Link>
-      
-      <Link href="/Leaderboard" className="w-full">
-        <Button className="w-full bg-gradient-to-br from-pink-400 to-rose-500 hover:from-pink-500 hover:to-rose-600 text-white text-xl py-8 px-6 rounded-2xl shadow-lg transform transition-all duration-300 hover:scale-105 hover:shadow-2xl border-2 border-pink-200/30 group">
-          <span className="flex items-center justify-center gap-4 font-semibold">
-            <span className="text-3xl group-hover:animate-bounce">🏆</span>
-            Leaderboard
-            <span className="text-3xl group-hover:animate-bounce">👑</span>
-          </span>
-        </Button>
-      </Link>
-    </div>
-      
-    </div>
     </ClerkProvider>
-
   );
 }

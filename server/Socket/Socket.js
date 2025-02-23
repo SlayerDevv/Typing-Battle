@@ -297,7 +297,10 @@ export const initializeSocket = (server) => {
     });
 
     socket.on("changeText", ({ roomId, text }) => {
-      io.to(roomId).emit("textChanged", { newText: text });
+      io.to(roomId).emit("textChanged", { Text: text });
+      console.log("Text changed to:", text);
+      let room = rooms.get(roomId);
+      console.log(room)
     });
     socket.on("resetText", ({ roomId, text }) => {
       // Find the room by roomId
@@ -307,7 +310,7 @@ export const initializeSocket = (server) => {
        
           room.ready=[],
           room.status = "waiting";
-          room.newText = text;
+          room.text = text;
     
         // Emit the updated room data to all players in the room
         io.to(roomId).emit("roomData", room);

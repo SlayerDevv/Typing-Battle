@@ -68,8 +68,10 @@ const TypingCmp: React.FC<TypingCmpProps> = ({ socket, roomId, playerId, counter
   
 
   useEffect(() => {
-    socket.on("textChanged", ({ newText }: { newText: string }) => {
-      setCurrentText(newText);
+    console.log("useEffect called")
+    socket.on("textChanged", ({ text }: { text: string }) => {
+      setCurrentText(text);
+      console.log("text have been changed in useEffect")
       setUserInput("");
     setStartTime(null);
     setCurrentPosition(0);
@@ -95,9 +97,7 @@ const TypingCmp: React.FC<TypingCmpProps> = ({ socket, roomId, playerId, counter
       textAreaRef.current.focus();
     }
     });
-    return () => {
-      socket.off("textChanged");
-    };
+
   }, [socket]);
   
 
@@ -330,6 +330,7 @@ const TypingCmp: React.FC<TypingCmpProps> = ({ socket, roomId, playerId, counter
   const handleChangeText = () => {
     const newText = textOptions[Math.floor(Math.random() * textOptions.length)];
     setCurrentText(newText);
+    console.log("text have been changed")
     setUserInput("");
     setStartTime(null);
     setCurrentPosition(0);

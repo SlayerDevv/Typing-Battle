@@ -19,7 +19,7 @@ import OpponentStats from "../components/OpponentStats";
 // import {IP} from "./ip";
 import React from "react";
 
-const socket = io(`wss://typing-battle.onrender.com/`, {
+const socket = io(`http://localhost:4000/`, {
   transports: ["websocket"],
 });
 

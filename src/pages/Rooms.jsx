@@ -55,7 +55,7 @@ export default function RoomsPage() {
     setPlayerId(playerId);
 
     // Initialize the socket connection after playerId is ready
-    socket = io(`http://localhost:4000/`, {
+    socket = io(`https://typing-battle.onrender.com`, {
       transports: ["websocket"],
       query: { playerId }, // Send playerId during initial connection
     });

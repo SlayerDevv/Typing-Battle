@@ -355,7 +355,6 @@ const handleFontSizeChange = (size: string) => {
            duration-200 ${themes[currentTheme].className}`}
       >
         {renderText()}
-        <span className="animate-pulse ">|</span>
       </div>
       <div className='flex justify-center'>
         <Button 

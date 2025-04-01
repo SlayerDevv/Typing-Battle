@@ -112,19 +112,22 @@ const Individual = () => {
             </div>
 
             <Button
-              onClick={generateRandomText}
-              disabled={isAnimating}
-              className="group relative flex items-center gap-2 bg-accent text-black hover:text-accent text-xl py-6 px-8 transition-all duration-300 hover:shadow-lg"
-            >
-              <Keyboard className="w-6 h-6 transition-transform group-hover:scale-110" />
-              {isAnimating ? (
-                <span className="flex items-center gap-2">
-                  Generating <Loader2 className="w-4 h-4 animate-spin" />
-                </span>
-              ) : (
-                "Generate New Text"
-              )}
-            </Button>
+                onClick={generateRandomText}
+                disabled={isAnimating}
+                variant="outline"
+                className="group relative flex items-center gap-2 bg-zinc-900 border-zinc-700 text-zinc-300 hover:text-white hover:bg-zinc-800 text-sm py-2 px-4 rounded-md transition-all duration-200"
+              >
+                {isAnimating ? (
+                  <span className="flex items-center gap-2">
+                    generating <Loader2 className="w-4 h-4 animate-spin" />
+                  </span>
+                ) : (
+                  <>
+                    <Keyboard className="w-4 h-4" />
+                    Generate
+                  </>
+                )}
+              </Button>
 
             {randomText ? (
               <TypingCmpInd

@@ -139,9 +139,7 @@ const IndividualRoom: React.FC = async () => {
 
         {/* Typing Challenge Card */}
         <div className="flex justify-center items-center flex-grow pt-24">
-        <Card className="bg-black/30 w-full sm:w-4/5 md:w-3/4 lg:w-2/3 h-auto min-h-[400px] p-8 border-none">
                 <Individual />
-            </Card>
         </div>
     </div>
 </div>

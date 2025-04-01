@@ -10,13 +10,16 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from './ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { RefreshCw } from "lucide-react"
 const themes = {
-  dark: 'bg-gray-900',
-  blue: 'bg-blue-900',
-  green: 'bg-green-900',
-  purple: 'bg-purple-900'
-};
-
+  serika: { className: "bg-[#323437] text-[#e2b714]", primary: "#e2b714" },
+  dracula: { className: "bg-[#282a36] text-[#bd93f9]", primary: "#bd93f9" },
+  nord: { className: "bg-[#242933] text-[#88c0d0]", primary: "#88c0d0" },
+  coral: { className: "bg-[#1e1e1e] text-[#ff9a8b]", primary: "#ff9a8b" },
+  matrix: { className: "bg-[#0d0208] text-[#00ff41]", primary: "#00ff41" },
+  minimal: { className: "bg-gray-800 text-[#e0e0e0]", primary: "#e0e0e0" },
+}
+console.log(themes.coral.primary)
 type ThemeKey = keyof typeof themes;
 interface TypingStats {
   wpm: number;
@@ -40,16 +43,26 @@ const TypingCmpInd: React.FC<TypingCmpProps> = ({ playerId,userId, counter, samp
   const [currentPosition, setCurrentPosition] = useState<number>(0);
   const [currentErrors, setCurrentErrors] = useState<number>(0);
   const [isCompleted, setIsCompleted] = useState(false);
-  const [isSoundEnabled] = useState(true);
+  const [isSoundEnabled,setIsSoundEnabled ] = useState(true);
   const [stats, setStats] = useState<TypingStats>({
     wpm: 0,
-    accuracy: 100,
+    accuracy: 0,
     errors: 0,
     totalTyped: 0,
   });
 
   const textAreaRef = useRef<HTMLDivElement>(null);
-  const [currentTheme, setCurrentTheme] = useState<ThemeKey>('dark');
+  const [currentTheme, setCurrentTheme] = useState<ThemeKey>('minimal');
+  const [fontSize, setFontSize] = useState<string>("text-lg"); // Default size
+
+// Add this function to handle font size changes
+const handleFontSizeChange = (size: string) => {
+  setFontSize(size);
+  // Maintain focus after font size change
+  setTimeout(() => {
+    textAreaRef.current?.focus();
+  }, 0);
+};
 
   const handleReplay = (e: React.MouseEvent) => {
     e.preventDefault(); // Prevent button from taking focus
@@ -185,12 +198,12 @@ const TypingCmpInd: React.FC<TypingCmpProps> = ({ playerId,userId, counter, samp
           
           if (index < userInput.length) {
             if (userInput[index] === char) {
-              charClass = "text-white";
+              charClass = themes[currentTheme].className;
             } else {
               charClass = "text-red-500";
             }
           } else if (index === userInput.length) {
-            charClass = "text-white bg-white/20";
+            charClass = `text-white bg-white/20`;
           }
 
           const isSpace = char === " ";
@@ -263,37 +276,95 @@ const TypingCmpInd: React.FC<TypingCmpProps> = ({ playerId,userId, counter, samp
         <div>Errors: <b>{currentErrors}</b></div>
       </div>
 
-      <div className="flex justify-center mb-4">
-        <Select value={currentTheme} onValueChange={handleThemeChange}>
-          <SelectTrigger className="w-[180px] text-white">
-            <SelectValue placeholder="Select theme" />
-          </SelectTrigger>
-          <SelectContent>
-            {Object.keys(themes).map((theme) => (
-              <SelectItem key={theme} value={theme}>
-                {theme.charAt(0).toUpperCase() + theme.slice(1)}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
+      <div className="flex items-center gap-3 p-4 rounded-lg bg-gray-800/90 backdrop-blur-sm shadow-lg">
+  <div className="flex items-center justify-center gap-3 w-full">
+    <Select value={currentTheme} onValueChange={handleThemeChange}>
+      <SelectTrigger className="w-40 bg-gray-700 border-gray-600 rounded-md text-white hover:bg-gray-600 transition-colors">
+        <div className="flex items-center">
+          <SelectValue placeholder="Select theme" />
+        </div>
+      </SelectTrigger>
+      <SelectContent className="bg-gray-700 border-gray-600 text-white rounded-md">
+        {Object.keys(themes).map((theme) => (
+          <SelectItem 
+            key={theme} 
+            value={theme} 
+            className="hover:bg-gray-600 focus:bg-gray-600"
+          >
+            <div className="flex items-center">
+              <div 
+                className="w-3 h-3 rounded-full mr-2" 
+                style={{ backgroundColor: themes[theme as ThemeKey].primary || '#fff' }}
+              />
+              {theme.charAt(0).toUpperCase() + theme.slice(1)}
+            </div>
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
 
+    <Select value={fontSize} onValueChange={handleFontSizeChange}>
+      <SelectTrigger className="w-32 bg-gray-700 border-gray-600 rounded-md text-white hover:bg-gray-600 transition-colors">
+        <div className="flex items-center">
+          <span className="text-gray-400 mr-2">Aa</span>
+          <SelectValue placeholder="Size" />
+        </div>
+      </SelectTrigger>
+      <SelectContent className="bg-gray-700 border-gray-600 text-white rounded-md">
+        <SelectItem value="text-sm" className="hover:bg-gray-600 focus:bg-gray-600">Small</SelectItem>
+        <SelectItem value="text-lg" className="hover:bg-gray-600 focus:bg-gray-600">Medium</SelectItem>
+        <SelectItem value="text-xl" className="hover:bg-gray-600 focus:bg-gray-600">Large</SelectItem>
+        <SelectItem value="text-2xl" className="hover:bg-gray-600 focus:bg-gray-600">X-Large</SelectItem>
+      </SelectContent>
+    </Select>
+  </div>
+
+  <Button 
+    onClick={() => {setIsSoundEnabled(!isSoundEnabled)}}
+    className="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-md transition-colors flex items-center gap-2"
+  >
+    {isSoundEnabled ? (
+      <>
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <path d="M11 5L6 9H2v6h4l5 4V5z" />
+          <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
+          <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
+        </svg>
+        Mute
+      </>
+    ) : (
+      <>
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <path d="M11 5L6 9H2v6h4l5 4V5z" />
+          <line x1="23" y1="9" x2="17" y2="15" />
+          <line x1="17" y1="9" x2="23" y2="15" />
+        </svg>
+        Unmute
+      </>
+    )}
+  </Button>
+</div>
+
+      {/* Typing Area */}
       <div
         ref={textAreaRef}
         tabIndex={0}
         onKeyDown={counter > 0 ? undefined : handleKeyDown}
-        className={`text-area p-4 ${themes[currentTheme]} rounded-lg font-mono text-lg leading-relaxed 
-          whitespace-pre-wrap focus:outline-none focus:ring-2 min-h-[200px] cursor-text
-         'text-slate-100'}`}>
+        className={`px-6 p-3 rounded-lg font-mono ${fontSize} leading-relaxed 
+          whitespace-pre-wrap focus:outline-none focus:ring-1 focus:ring-[${themes[currentTheme].primary}] min-h-[180px]
+           duration-200 ${themes[currentTheme].className}`}
+      >
         {renderText()}
-        <span className="animate-pulse">|</span>
+        <span className="animate-pulse ">|</span>
       </div>
       <div className='flex justify-center'>
         <Button 
           onClick={handleReplay}
-          className="bg-red-500 hover:bg-red-600 text-lg font-bold p-4 rounded-lg border"
+          size="sm"
+          className="text-zinc-400 hover:text-white  text-lg"
         > 
-          Replay
+          <RefreshCw className="w-3 h-3 mr-2" />
+          Restart
         </Button>
       </div>
       

@@ -27,10 +27,6 @@ interface TypingCmpProps {
 }
 import { Socket } from "socket.io-client";
 
-
-
-
-
 const TypingCmp: React.FC<TypingCmpProps> = ({ socket, roomId, playerId, counter,sampleText }) => {
 
   

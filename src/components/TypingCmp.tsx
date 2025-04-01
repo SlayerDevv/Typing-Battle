@@ -1,16 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
-import {
-  AlertDialog,
-  AlertDialogContent,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogAction,
-} from "@/components/ui/alert-dialog";
+import CompletionDialog from './CompletionDialogMulti';
+import SettingsPanel from './SettingsPanel';
 import { textOptions } from '@/config/phrases';
-import { Button } from './ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 interface TypingStats {
   wpm: number;
   accuracy: number;
@@ -55,7 +46,7 @@ const TypingCmp: React.FC<TypingCmpProps> = ({ socket, roomId, playerId, counter
     wpm: number;
     accuracy: number;
     errors: number;
-  } | null>(null);
+  } | undefined>(undefined);
   
  
   const [currentText, setCurrentText] = useState<string>(sampleText);
@@ -96,7 +87,7 @@ const TypingCmp: React.FC<TypingCmpProps> = ({ socket, roomId, playerId, counter
         wpm: 0,
         accuracy: 100,
         errors: 0,
-      } : null
+      } : undefined
     );
   
     // Focus back on the text area
@@ -300,7 +291,7 @@ const TypingCmp: React.FC<TypingCmpProps> = ({ socket, roomId, playerId, counter
         wpm: 0,
         accuracy: 100,
         errors: 0,
-      } : null
+      } : undefined
     );
   
     // Focus back on the text area
@@ -339,7 +330,7 @@ const TypingCmp: React.FC<TypingCmpProps> = ({ socket, roomId, playerId, counter
         wpm: 0,
         accuracy: 100,
         errors: 0,
-      } : null
+      } : undefined
     );
   
     // Focus back on the text area
@@ -361,162 +352,46 @@ const TypingCmp: React.FC<TypingCmpProps> = ({ socket, roomId, playerId, counter
   return (
     <div className=" mx-auto w-full lg:w-2/3 p-6 space-y-6">
       <div className="stats flex justify-between mb-4 text-lg text-white">
-      <div>WPM: <b>{stats.wpm}</b></div>
-        <div>Accuracy: <b>{stats.accuracy}%</b></div>
-        <div>Errors: <b>{currentErrors}</b></div>
+        <div>
+          WPM: <b>{stats.wpm}</b>
+        </div>
+        <div>
+          Accuracy: <b>{stats.accuracy}%</b>
+        </div>
+        <div>
+          Errors: <b>{currentErrors}</b>
+        </div>
       </div>
       <div className="flex items-center gap-3 p-4 rounded-lg bg-gray-800/90 backdrop-blur-sm shadow-lg">
-  <div className="flex items-center justify-between gap-3 w-full">
-    <Select value={currentTheme} onValueChange={handleThemeChange}>
-      <SelectTrigger className="w-40 bg-gray-700 border-gray-600 rounded-md text-white hover:bg-gray-600 transition-colors">
-        <div className="flex items-center">
-          <SelectValue placeholder="Select theme" />
-        </div>
-      </SelectTrigger>
-      <SelectContent className="bg-gray-700 border-gray-600 text-white rounded-md">
-        {Object.keys(themes).map((theme) => (
-          <SelectItem 
-            key={theme} 
-            value={theme} 
-            className="hover:bg-gray-600 focus:bg-gray-600"
-          >
-            <div className="flex items-center">
-              <div 
-                className="w-3 h-3 rounded-full mr-2" 
-                style={{ backgroundColor: themes[theme as ThemeKey].primary || '#fff' }}
-              />
-              {theme.charAt(0).toUpperCase() + theme.slice(1)}
-            </div>
-          </SelectItem>
-        ))}
-      </SelectContent>
-    </Select>
-         <Select value={fontSize} onValueChange={handleFontSizeChange}>
-              <SelectTrigger className="w-32 bg-gray-700 border-gray-600 rounded-md text-white hover:bg-gray-600 transition-colors">
-                <div className="flex items-center">
-                  <span className="text-gray-400 mr-2">Aa</span>
-                  <SelectValue placeholder="Size" />
-                </div>
-              </SelectTrigger>
-              <SelectContent className="bg-gray-700 border-gray-600 text-white rounded-md">
-                <SelectItem value="text-sm" className="hover:bg-gray-600 focus:bg-gray-600">Small</SelectItem>
-                <SelectItem value="text-lg" className="hover:bg-gray-600 focus:bg-gray-600">Medium</SelectItem>
-                <SelectItem value="text-xl" className="hover:bg-gray-600 focus:bg-gray-600">Large</SelectItem>
-                <SelectItem value="text-2xl" className="hover:bg-gray-600 focus:bg-gray-600">X-Large</SelectItem>
-              </SelectContent>
-            </Select>
-
-  <Button 
-    onClick={() => {setIsSoundEnabled(!isSoundEnabled)}}
-    className="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-md transition-colors flex items-center gap-2"
-  >
-    {isSoundEnabled ? (
-      <>
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-          <path d="M11 5L6 9H2v6h4l5 4V5z" />
-          <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
-          <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
-        </svg>
-        Mute
-      </>
-    ) : (
-      <>
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-          <path d="M11 5L6 9H2v6h4l5 4V5z" />
-          <line x1="23" y1="9" x2="17" y2="15" />
-          <line x1="17" y1="9" x2="23" y2="15" />
-        </svg>
-        Unmute
-      </>
-    )}
-  </Button>
-</div>
-</div>
+        <SettingsPanel
+          currentTheme={currentTheme}
+          handleThemeChange={handleThemeChange}
+          fontSize={fontSize}
+          handleFontSizeChange={handleFontSizeChange}
+          isSoundEnabled={isSoundEnabled}
+          setIsSoundEnabled={setIsSoundEnabled}
+          themes={themes}
+        />
+      </div>
       {/* Typing Area */}
-            <div
-              ref={textAreaRef}
-              tabIndex={0}
-              onKeyDown={counter > 0 ? undefined : handleKeyDown}
-              className={`px-6 p-3 rounded-lg font-mono ${fontSize} leading-relaxed 
+      <div
+        ref={textAreaRef}
+        tabIndex={0}
+        onKeyDown={counter > 0 ? undefined : handleKeyDown}
+        className={`px-6 p-3 rounded-lg font-mono ${fontSize} leading-relaxed 
                 whitespace-pre-wrap focus:outline-none focus:ring-1 focus:ring-[${themes[currentTheme].primary}] min-h-[180px]
                  duration-200 ${themes[currentTheme].className}`}
-            >
-              {renderText()}
+      >
+        {renderText()}
       </div>
-      <AlertDialog open={isCompleted}>
-        <AlertDialogContent className="bg-gray-800 text-white border-none ">
-          <AlertDialogHeader>
-            <AlertDialogTitle className="text-2xl font-bold text-center mb-4">
-              Text Completed! 🎉
-            </AlertDialogTitle>
-            <AlertDialogDescription className="space-y-4 text-lg text-center">
-              <div className="grid grid-cols-3 gap-4">
-                <div className="bg-gray-700 p-4 rounded-lg">
-                  <div className="font-semibold text-white">WPM</div>
-                  <div className="text-2xl text-green-500 font-bold">{stats.wpm}</div>
-                </div>
-                <div className="bg-gray-700 p-4 rounded-lg">
-                  <div className="font-semibold text-white">Accuracy</div>
-                  <div className="text-2xl text-blue-500 font-bold">
-                    {stats.accuracy}%
-                  </div>
-                </div>
-                <div className="bg-gray-700 p-4 rounded-lg">
-                  <div className="font-semibold text-white">Errors</div>
-                  <div className="text-2xl text-red-500 font-bold">{stats.errors}</div>
-                </div>
-              </div>
-              {opponentStats && (
-                <div>
-                  <AlertDialogTitle className="text-2xl font-bold text-center mt-4 text-white">
-                    {opponentStats.playerName} Stats
-                  </AlertDialogTitle>
-                  <div className="grid grid-cols-3 gap-4">
-                    <div className="bg-gray-700 p-4 rounded-lg">
-                      <div className="font-semibold text-white">WPM</div>
-                      <div className="text-2xl text-green-500 font-bold">
-                        {opponentStats.wpm}
-                      </div>
-                    </div>
-                    <div className="bg-gray-700 p-4 rounded-lg">
-                      <div className="font-semibold text-white">Accuracy</div>
-                      <div className="text-2xl text-blue-500 font-bold">
-                        {opponentStats.accuracy}%
-                      </div>
-                    </div>
-                    <div className="bg-gray-700 p-4 rounded-lg">
-                      <div className="font-semibold text-white">Errors</div>
-                      <div className="text-2xl text-red-500 font-bold">
-                        {opponentStats.errors}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogAction
-              onClick={() => setIsCompleted(false)}
-              className="bg-green-500 hover:bg-green-600 w-1/2 text-lg font-bold p-4 rounded-lg border"
-            >
-              Close
-            </AlertDialogAction>
-            <AlertDialogAction
-                onClick={handleReset}
-                    className="px-4 py-2 bg-purple-600 w-1/2 hover:bg-purple-700 text-white rounded-lg transition-colors"
-                  >
-                    Restart Game
-              </AlertDialogAction>
-              <AlertDialogAction
-                onClick={handleChangeText}
-                    className="px-4 py-2 bg-blue-600 w-1/2 hover:bg-blue-700 text-white rounded-lg transition-colors"
-                  >
-                    Change text and restart
-              </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <CompletionDialog
+        isCompleted={isCompleted}
+        setIsCompleted={setIsCompleted}
+        stats={stats}
+        opponentStats={opponentStats}
+        handleReset={handleReset}
+        handleChangeText={handleChangeText}
+      />
     </div>
   );
 };

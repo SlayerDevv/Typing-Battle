@@ -223,7 +223,7 @@ export default function TypingRoom() {
         
         <CardHeader className="space-y-8">
         <CardTitle className="text-white text-4xl text-center font-bold tracking-wide bg-clip-text">
-           Room: "{roomId}"
+           Room: &rdquo;{roomId}&rdquo;
           </CardTitle>
         </CardHeader>
 

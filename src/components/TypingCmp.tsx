@@ -1,14 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
-import {
-  AlertDialog,
-  AlertDialogContent,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogAction,
-} from "@/components/ui/alert-dialog";
-
+import CompletionDialog from './CompletionDialogMulti';
+import SettingsPanel from './SettingsPanel';
+import { textOptions } from '@/config/phrases';
 interface TypingStats {
   wpm: number;
   accuracy: number;
@@ -26,10 +19,8 @@ interface TypingCmpProps {
   
 }
 import { Socket } from "socket.io-client";
-
-
-
-
+import { themes } from '@/config/themes';
+type ThemeKey = keyof typeof themes;
 
 const TypingCmp: React.FC<TypingCmpProps> = ({ socket, roomId, playerId, counter,sampleText }) => {
 
@@ -40,10 +31,13 @@ const TypingCmp: React.FC<TypingCmpProps> = ({ socket, roomId, playerId, counter
   const [currentPosition, setCurrentPosition] = useState<number>(0);
   const [currentErrors, setCurrentErrors] = useState<number>(0);
   const [isCompleted, setIsCompleted] = useState(false);
-  const [isSoundEnabled] = useState(true);
+  const [isSoundEnabled,setIsSoundEnabled ] = useState(true);
+  const [currentTheme, setCurrentTheme] = useState<ThemeKey>('minimal');
+  const [fontSize, setFontSize] = useState<string>("text-lg"); // Default size
+  
   const [stats, setStats] = useState<TypingStats>({
     wpm: 0,
-    accuracy: 100,
+    accuracy: 0,
     errors: 0,
     totalTyped: 0,
   });
@@ -52,7 +46,7 @@ const TypingCmp: React.FC<TypingCmpProps> = ({ socket, roomId, playerId, counter
     wpm: number;
     accuracy: number;
     errors: number;
-  } | null>(null);
+  } | undefined>(undefined);
   
  
   const [currentText, setCurrentText] = useState<string>(sampleText);
@@ -65,7 +59,11 @@ const TypingCmp: React.FC<TypingCmpProps> = ({ socket, roomId, playerId, counter
   }, []);
 
   
-  
+  const handleThemeChange = (value: ThemeKey) => {
+    setCurrentTheme(value);
+    // Maintain focus after theme change
+    textAreaRef.current?.focus();
+  };
 
   useEffect(() => {
     console.log("useEffect called")
@@ -89,7 +87,7 @@ const TypingCmp: React.FC<TypingCmpProps> = ({ socket, roomId, playerId, counter
         wpm: 0,
         accuracy: 100,
         errors: 0,
-      } : null
+      } : undefined
     );
   
     // Focus back on the text area
@@ -238,7 +236,7 @@ const TypingCmp: React.FC<TypingCmpProps> = ({ socket, roomId, playerId, counter
           
           if (index < userInput.length) {
             if (userInput[index] === char) {
-              charClass = "text-white";
+              charClass = themes[currentTheme].className;
             } else {
               charClass = "text-red-500";
             }
@@ -283,7 +281,7 @@ const TypingCmp: React.FC<TypingCmpProps> = ({ socket, roomId, playerId, counter
     setIsCompleted(false);
     setStats({
       wpm: 0,
-      accuracy: 100,
+      accuracy: 0,
       errors: 0,
       totalTyped: 0,
     });
@@ -293,7 +291,7 @@ const TypingCmp: React.FC<TypingCmpProps> = ({ socket, roomId, playerId, counter
         wpm: 0,
         accuracy: 100,
         errors: 0,
-      } : null
+      } : undefined
     );
   
     // Focus back on the text area
@@ -310,22 +308,6 @@ const TypingCmp: React.FC<TypingCmpProps> = ({ socket, roomId, playerId, counter
     });
   };
 
-
-
- 
-  const textOptions = [
-    "The quick brown fox jumps over the lazy dog. Programming is the art of telling another human what one wants the computer to do.",
-    "In the world of coding, every semicolon matters. A single character can make the difference between a working program and a syntax error that keeps you debugging for hours.",
-    "Technology has revolutionized the way we live, work, and connect with others. As we continue to innovate, the possibilities seem endless in this digital age.",
-    "Software development is like building a house. You need a solid foundation, careful planning, and attention to detail. Testing ensures your structure won't collapse.",
-    "The best code is not just functional but also readable and maintainable. Clean code reads like well-written prose and tells a story about its purpose.",
-    "Artificial intelligence and machine learning are transforming industries across the globe. The future holds endless possibilities for those who embrace these technologies.",
-    "Great developers write code that humans can understand. Documentation is not just helpful; it's essential for maintaining and scaling software projects effectively.",
-    "Version control is like a time machine for your code. Git allows developers to experiment freely, knowing they can always return to a working state if needed.",
-    "The internet is a vast network connecting billions of devices worldwide. Every click, every search, and every message travels through this intricate web of connections.",
-    "Security in software development is not an afterthought but a fundamental requirement. Every line of code must be written with potential vulnerabilities in mind."
-  ];
-  
 
   const handleChangeText = () => {
     const newText = textOptions[Math.floor(Math.random() * textOptions.length)];
@@ -348,7 +330,7 @@ const TypingCmp: React.FC<TypingCmpProps> = ({ socket, roomId, playerId, counter
         wpm: 0,
         accuracy: 100,
         errors: 0,
-      } : null
+      } : undefined
     );
   
     // Focus back on the text area
@@ -360,98 +342,56 @@ const TypingCmp: React.FC<TypingCmpProps> = ({ socket, roomId, playerId, counter
     socket.emit("changeText", { roomId, text: newText });
   }
 
-
+  const handleFontSizeChange = (size: string) => {
+    setFontSize(size);
+    // Maintain focus after font size change
+    setTimeout(() => {
+      textAreaRef.current?.focus();
+    }, 0);
+  };
   return (
-    <div className="max-w-3xl mx-auto p-6 space-y-6">
+    <div className=" mx-auto w-full lg:w-2/3 p-6 space-y-6">
       <div className="stats flex justify-between mb-4 text-lg text-white">
-        <div>WPM: {stats.wpm}</div>
-        <div>Accuracy: {stats.accuracy}%</div>
-        <div>Errors: {currentErrors}</div>
+        <div>
+          WPM: <b>{stats.wpm}</b>
+        </div>
+        <div>
+          Accuracy: <b>{stats.accuracy}%</b>
+        </div>
+        <div>
+          Errors: <b>{currentErrors}</b>
+        </div>
       </div>
-
+      <div className="flex items-center gap-3 p-4 rounded-lg bg-gray-800/90 backdrop-blur-sm shadow-lg">
+        <SettingsPanel
+          currentTheme={currentTheme}
+          handleThemeChange={handleThemeChange}
+          fontSize={fontSize}
+          handleFontSizeChange={handleFontSizeChange}
+          isSoundEnabled={isSoundEnabled}
+          setIsSoundEnabled={setIsSoundEnabled}
+          themes={themes}
+        />
+      </div>
+      {/* Typing Area */}
       <div
         ref={textAreaRef}
         tabIndex={0}
-        onKeyDown={counter > 0 ? undefined : handleKeyDown  }
-        className={`text-area p-4 bg-gray-900 rounded-lg font-mono text-lg leading-relaxed whitespace-pre-wrap focus:outline-none focus:ring-2 min-h-[200px] cursor-text`}
+        onKeyDown={counter > 0 ? undefined : handleKeyDown}
+        className={`px-6 p-3 rounded-lg font-mono ${fontSize} leading-relaxed 
+                whitespace-pre-wrap focus:outline-none focus:ring-1 focus:ring-[${themes[currentTheme].primary}] min-h-[180px]
+                 duration-200 ${themes[currentTheme].className}`}
       >
         {renderText()}
-        <span className="animate-pulse">|</span>
       </div>
-      <AlertDialog open={isCompleted}>
-        <AlertDialogContent className="bg-gray-800 text-white border-none ">
-          <AlertDialogHeader>
-            <AlertDialogTitle className="text-2xl font-bold text-center mb-4">
-              Text Completed! 🎉
-            </AlertDialogTitle>
-            <AlertDialogDescription className="space-y-4 text-lg text-center">
-              <div className="grid grid-cols-3 gap-4">
-                <div className="bg-gray-700 p-4 rounded-lg">
-                  <div className="font-semibold text-white">WPM</div>
-                  <div className="text-2xl text-green-500 font-bold">{stats.wpm}</div>
-                </div>
-                <div className="bg-gray-700 p-4 rounded-lg">
-                  <div className="font-semibold text-white">Accuracy</div>
-                  <div className="text-2xl text-blue-500 font-bold">
-                    {stats.accuracy}%
-                  </div>
-                </div>
-                <div className="bg-gray-700 p-4 rounded-lg">
-                  <div className="font-semibold text-white">Errors</div>
-                  <div className="text-2xl text-red-500 font-bold">{stats.errors}</div>
-                </div>
-              </div>
-              {opponentStats && (
-                <div>
-                  <AlertDialogTitle className="text-2xl font-bold text-center mt-4 text-white">
-                    {opponentStats.playerName} Stats
-                  </AlertDialogTitle>
-                  <div className="grid grid-cols-3 gap-4">
-                    <div className="bg-gray-700 p-4 rounded-lg">
-                      <div className="font-semibold text-white">WPM</div>
-                      <div className="text-2xl text-green-500 font-bold">
-                        {opponentStats.wpm}
-                      </div>
-                    </div>
-                    <div className="bg-gray-700 p-4 rounded-lg">
-                      <div className="font-semibold text-white">Accuracy</div>
-                      <div className="text-2xl text-blue-500 font-bold">
-                        {opponentStats.accuracy}%
-                      </div>
-                    </div>
-                    <div className="bg-gray-700 p-4 rounded-lg">
-                      <div className="font-semibold text-white">Errors</div>
-                      <div className="text-2xl text-red-500 font-bold">
-                        {opponentStats.errors}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogAction
-              onClick={() => setIsCompleted(false)}
-              className="bg-green-500 hover:bg-green-600 w-1/2 text-lg font-bold p-4 rounded-lg border"
-            >
-              Close
-            </AlertDialogAction>
-            <AlertDialogAction
-                onClick={handleReset}
-                    className="px-4 py-2 bg-purple-600 w-1/2 hover:bg-purple-700 text-white rounded-lg transition-colors"
-                  >
-                    Restart Game
-              </AlertDialogAction>
-              <AlertDialogAction
-                onClick={handleChangeText}
-                    className="px-4 py-2 bg-blue-600 w-1/2 hover:bg-blue-700 text-white rounded-lg transition-colors"
-                  >
-                    Change text and restart
-              </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <CompletionDialog
+        isCompleted={isCompleted}
+        setIsCompleted={setIsCompleted}
+        stats={stats}
+        opponentStats={opponentStats}
+        handleReset={handleReset}
+        handleChangeText={handleChangeText}
+      />
     </div>
   );
 };

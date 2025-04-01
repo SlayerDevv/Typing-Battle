@@ -16,10 +16,11 @@ import "../app/globals.css";
 import TypingCmp from "../components/TypingCmp";
 import TimerDisplay from "../components/TimerDisplay";
 import OpponentStats from "../components/OpponentStats";
+import { textOptions } from "@/config/phrases";
 // import {IP} from "./ip";
 import React from "react";
 
-const socket = io(`http://localhost:4000/`, {
+const socket = io(`https://typing-battle.onrender.com`, {
   transports: ["websocket"],
 });
 
@@ -63,30 +64,6 @@ export default function TypingRoom() {
     toggleReset:resetTypingTimer,
   } = useCounter(5);
 
-  
-  // const {
-  //   toggleStart: startTypingTimer,
-  //   toggleReset: resetTypingTimer,
-  //   Counter: typingTime,
-  //   setCounter: setTypingDuration, 
-  // } = useCounter(5); 
-
-  
-  // useEffect(() => {
-  //   if (preparationTime === 0 && !isPreparationRunning) {
-  //     startTypingTimer();
-  //   }
-  // }, [preparationTime, isPreparationRunning, startTypingTimer]);
-
-  
-  // useEffect(() => {
-  //   if (RoomData?.text) {
-  //     const chars = RoomData.text.length;
-  //     const timerDuration = Math.ceil((chars / 5) / 40 * 60); 
-  //     setTypingDuration(timerDuration); 
-  //   }
-  // }, [RoomData?.text, setTypingDuration]);
-
 
 
   const searchParams = useSearchParams();
@@ -95,18 +72,6 @@ export default function TypingRoom() {
     socket.emit("playerReady", { playerId, roomId });
    
   };
-  const textOptions = [
-    "The quick brown fox jumps over the lazy dog. Programming is the art of telling another human what one wants the computer to do.",
-    "In the world of coding, every semicolon matters. A single character can make the difference between a working program and a syntax error that keeps you debugging for hours.",
-    "Technology has revolutionized the way we live, work, and connect with others. As we continue to innovate, the possibilities seem endless in this digital age.",
-    "Software development is like building a house. You need a solid foundation, careful planning, and attention to detail. Testing ensures your structure won't collapse.",
-    "The best code is not just functional but also readable and maintainable. Clean code reads like well-written prose and tells a story about its purpose.",
-    "Artificial intelligence and machine learning are transforming industries across the globe. The future holds endless possibilities for those who embrace these technologies.",
-    "Great developers write code that humans can understand. Documentation is not just helpful; it's essential for maintaining and scaling software projects effectively.",
-    "Version control is like a time machine for your code. Git allows developers to experiment freely, knowing they can always return to a working state if needed.",
-    "The internet is a vast network connecting billions of devices worldwide. Every click, every search, and every message travels through this intricate web of connections.",
-    "Security in software development is not an afterthought but a fundamental requirement. Every line of code must be written with potential vulnerabilities in mind."
-  ];
   
   const sampleText = textOptions[Math.floor(Math.random() * textOptions.length)];
 
@@ -252,36 +217,33 @@ export default function TypingRoom() {
   }
 
   return (
-    <div className="min-h-screen bg-[url('/bg.jpg')] bg-cover bg-center ">
-      <Card className={`w-full h-screen bg-purple-400 px-7 rounded-md bg-clip-padding backdrop-filter backdrop-blur-md bg-opacity-10 border-none`}>
+    <div className="min-h-screen bg-[url('/bg.jpg')] bg-cover bg-center  ">
+      <Card className={`w-full h-screen bg-black px-7 rounded-md bg-clip-padding backdrop-filter backdrop-blur-sm bg-opacity-20 border-none`}>
         {opponentStats && <OpponentStats {...opponentStats} />}
         
         <CardHeader className="space-y-8">
-        <CardTitle className="text-white text-6xl text-center font-bold tracking-wide bg-clip-text">
-           Room: {roomId} 
+        <CardTitle className="text-white text-4xl text-center font-bold tracking-wide bg-clip-text">
+           Room: &rdquo;{roomId}&rdquo;
           </CardTitle>
         </CardHeader>
 
-        <CardContent className="space-y-12">
+        <CardContent className="">
           <div className="text-white">
             <TimerDisplay counter={preparationTime} status={RoomData?.status} />
             
             <div className="text-center space-y-8 mb-12">
-            <h2 className="text-4xl font-bold text-white bg-clip-text">
+            <h2 className="text-2xl font-bold text-white bg-clip-text">
                {RoomData.status === 'waiting' && '⏳'}
                 {RoomData.status === 'running' && '🏃'}
                 {RoomData.status.toUpperCase()}
               </h2>
-              
-              <h3 className="text-4xl font-bold text-white bg-clip-text">
-                👥 Players 👥
-              </h3>
+
             </div>
 
-            <div className="flex items-center justify-center gap-8 mb-12">
+            <div className="flex items-center justify-center gap-8 mb-6">
               {RoomData.players.map((player, index) => (
                 <React.Fragment key={player.id}>
-                  <div className={`p-6 rounded-xl w-72 backdrop-blur-lg transform transition-all duration-300 
+                  <div className={`p-3 rounded-xl w-72 backdrop-blur-lg transform transition-all duration-300 
                     ${player.id === playerId 
                       ? "bg-white/10 border-2 border-green-400/20" 
                       : "bg-white/10 border-2 border-white/20"}`}>
@@ -310,7 +272,7 @@ export default function TypingRoom() {
                     </div>
                   </div>
                   {index === 0 && RoomData.players.length > 1 && (
-                    <div className="text-5xl font-bold bg-gradient-to-r from-white to-white text-transparent bg-clip-text animate-pulse">
+                    <div className="text-4xl font-bold bg-gradient-to-r from-white to-white text-transparent bg-clip-text animate-pulse">
                       VS
                     </div>
                   )}
@@ -320,7 +282,7 @@ export default function TypingRoom() {
           </div>
 
           {RoomData.ready.length >= 2 ? (
-            <div className="transform transition-all duration-500 hover:scale-[1.02]">
+            <div className="transform transition-all duration-500 ">
               <TypingCmp
                 socket={socket}
                 roomId={roomId!}

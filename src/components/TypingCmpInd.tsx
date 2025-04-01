@@ -8,15 +8,10 @@ import {
   AlertDialogFooter,
   AlertDialogAction,
 } from "@/components/ui/alert-dialog";
+import SettingsPanel from './SettingsPanel';
 import { Button } from './ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-const themes = {
-  dark: 'bg-gray-900',
-  blue: 'bg-blue-900',
-  green: 'bg-green-900',
-  purple: 'bg-purple-900'
-};
-
+import { RefreshCw } from "lucide-react"
+import {themes} from '../config/themes'
 type ThemeKey = keyof typeof themes;
 interface TypingStats {
   wpm: number;
@@ -40,16 +35,25 @@ const TypingCmpInd: React.FC<TypingCmpProps> = ({ playerId,userId, counter, samp
   const [currentPosition, setCurrentPosition] = useState<number>(0);
   const [currentErrors, setCurrentErrors] = useState<number>(0);
   const [isCompleted, setIsCompleted] = useState(false);
-  const [isSoundEnabled] = useState(true);
+  const [isSoundEnabled,setIsSoundEnabled ] = useState(true);
   const [stats, setStats] = useState<TypingStats>({
     wpm: 0,
-    accuracy: 100,
+    accuracy: 0,
     errors: 0,
     totalTyped: 0,
   });
 
   const textAreaRef = useRef<HTMLDivElement>(null);
-  const [currentTheme, setCurrentTheme] = useState<ThemeKey>('dark');
+  const [currentTheme, setCurrentTheme] = useState<ThemeKey>('minimal');
+  const [fontSize, setFontSize] = useState<string>("text-lg"); // Default size
+
+const handleFontSizeChange = (size: string) => {
+  setFontSize(size);
+  // Maintain focus after font size change
+  setTimeout(() => {
+    textAreaRef.current?.focus();
+  }, 0);
+};
 
   const handleReplay = (e: React.MouseEvent) => {
     e.preventDefault(); // Prevent button from taking focus
@@ -185,12 +189,12 @@ const TypingCmpInd: React.FC<TypingCmpProps> = ({ playerId,userId, counter, samp
           
           if (index < userInput.length) {
             if (userInput[index] === char) {
-              charClass = "text-white";
+              charClass = themes[currentTheme].className;
             } else {
               charClass = "text-red-500";
             }
           } else if (index === userInput.length) {
-            charClass = "text-white bg-white/20";
+            charClass = `text-white bg-white/20`;
           }
 
           const isSpace = char === " ";
@@ -263,37 +267,35 @@ const TypingCmpInd: React.FC<TypingCmpProps> = ({ playerId,userId, counter, samp
         <div>Errors: <b>{currentErrors}</b></div>
       </div>
 
-      <div className="flex justify-center mb-4">
-        <Select value={currentTheme} onValueChange={handleThemeChange}>
-          <SelectTrigger className="w-[180px] text-white">
-            <SelectValue placeholder="Select theme" />
-          </SelectTrigger>
-          <SelectContent>
-            {Object.keys(themes).map((theme) => (
-              <SelectItem key={theme} value={theme}>
-                {theme.charAt(0).toUpperCase() + theme.slice(1)}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
+      <SettingsPanel
+          currentTheme={currentTheme}
+          handleThemeChange={handleThemeChange}
+          fontSize={fontSize}
+          handleFontSizeChange={handleFontSizeChange}
+          isSoundEnabled={isSoundEnabled}
+          setIsSoundEnabled={setIsSoundEnabled}
+          themes={themes}
+        />
 
+      {/* Typing Area */}
       <div
         ref={textAreaRef}
         tabIndex={0}
         onKeyDown={counter > 0 ? undefined : handleKeyDown}
-        className={`text-area p-4 ${themes[currentTheme]} rounded-lg font-mono text-lg leading-relaxed 
-          whitespace-pre-wrap focus:outline-none focus:ring-2 min-h-[200px] cursor-text
-         'text-slate-100'}`}>
+        className={`px-6 p-3 rounded-lg font-mono ${fontSize} leading-relaxed 
+          whitespace-pre-wrap focus:outline-none focus:ring-1 focus:ring-[${themes[currentTheme].primary}] min-h-[180px]
+           duration-200 ${themes[currentTheme].className}`}
+      >
         {renderText()}
-        <span className="animate-pulse">|</span>
       </div>
       <div className='flex justify-center'>
         <Button 
           onClick={handleReplay}
-          className="bg-red-500 hover:bg-red-600 text-lg font-bold p-4 rounded-lg border"
+          size="sm"
+          className="text-zinc-400 hover:text-white  text-lg"
         > 
-          Replay
+          <RefreshCw className="w-3 h-3 mr-2" />
+          Restart
         </Button>
       </div>
       

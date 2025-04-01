@@ -8,7 +8,9 @@ import {
   AlertDialogFooter,
   AlertDialogAction,
 } from "@/components/ui/alert-dialog";
-
+import { textOptions } from '@/config/phrases';
+import { Button } from './ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 interface TypingStats {
   wpm: number;
   accuracy: number;
@@ -26,6 +28,8 @@ interface TypingCmpProps {
   
 }
 import { Socket } from "socket.io-client";
+import { themes } from '@/config/themes';
+type ThemeKey = keyof typeof themes;
 
 const TypingCmp: React.FC<TypingCmpProps> = ({ socket, roomId, playerId, counter,sampleText }) => {
 
@@ -36,10 +40,13 @@ const TypingCmp: React.FC<TypingCmpProps> = ({ socket, roomId, playerId, counter
   const [currentPosition, setCurrentPosition] = useState<number>(0);
   const [currentErrors, setCurrentErrors] = useState<number>(0);
   const [isCompleted, setIsCompleted] = useState(false);
-  const [isSoundEnabled] = useState(true);
+  const [isSoundEnabled,setIsSoundEnabled ] = useState(true);
+  const [currentTheme, setCurrentTheme] = useState<ThemeKey>('minimal');
+  const [fontSize, setFontSize] = useState<string>("text-lg"); // Default size
+  
   const [stats, setStats] = useState<TypingStats>({
     wpm: 0,
-    accuracy: 100,
+    accuracy: 0,
     errors: 0,
     totalTyped: 0,
   });
@@ -61,7 +68,11 @@ const TypingCmp: React.FC<TypingCmpProps> = ({ socket, roomId, playerId, counter
   }, []);
 
   
-  
+  const handleThemeChange = (value: ThemeKey) => {
+    setCurrentTheme(value);
+    // Maintain focus after theme change
+    textAreaRef.current?.focus();
+  };
 
   useEffect(() => {
     console.log("useEffect called")
@@ -234,7 +245,7 @@ const TypingCmp: React.FC<TypingCmpProps> = ({ socket, roomId, playerId, counter
           
           if (index < userInput.length) {
             if (userInput[index] === char) {
-              charClass = "text-white";
+              charClass = themes[currentTheme].className;
             } else {
               charClass = "text-red-500";
             }
@@ -279,7 +290,7 @@ const TypingCmp: React.FC<TypingCmpProps> = ({ socket, roomId, playerId, counter
     setIsCompleted(false);
     setStats({
       wpm: 0,
-      accuracy: 100,
+      accuracy: 0,
       errors: 0,
       totalTyped: 0,
     });
@@ -306,22 +317,6 @@ const TypingCmp: React.FC<TypingCmpProps> = ({ socket, roomId, playerId, counter
     });
   };
 
-
-
- 
-  const textOptions = [
-    "The quick brown fox jumps over the lazy dog. Programming is the art of telling another human what one wants the computer to do.",
-    "In the world of coding, every semicolon matters. A single character can make the difference between a working program and a syntax error that keeps you debugging for hours.",
-    "Technology has revolutionized the way we live, work, and connect with others. As we continue to innovate, the possibilities seem endless in this digital age.",
-    "Software development is like building a house. You need a solid foundation, careful planning, and attention to detail. Testing ensures your structure won't collapse.",
-    "The best code is not just functional but also readable and maintainable. Clean code reads like well-written prose and tells a story about its purpose.",
-    "Artificial intelligence and machine learning are transforming industries across the globe. The future holds endless possibilities for those who embrace these technologies.",
-    "Great developers write code that humans can understand. Documentation is not just helpful; it's essential for maintaining and scaling software projects effectively.",
-    "Version control is like a time machine for your code. Git allows developers to experiment freely, knowing they can always return to a working state if needed.",
-    "The internet is a vast network connecting billions of devices worldwide. Every click, every search, and every message travels through this intricate web of connections.",
-    "Security in software development is not an afterthought but a fundamental requirement. Every line of code must be written with potential vulnerabilities in mind."
-  ];
-  
 
   const handleChangeText = () => {
     const newText = textOptions[Math.floor(Math.random() * textOptions.length)];
@@ -356,23 +351,97 @@ const TypingCmp: React.FC<TypingCmpProps> = ({ socket, roomId, playerId, counter
     socket.emit("changeText", { roomId, text: newText });
   }
 
-
+  const handleFontSizeChange = (size: string) => {
+    setFontSize(size);
+    // Maintain focus after font size change
+    setTimeout(() => {
+      textAreaRef.current?.focus();
+    }, 0);
+  };
   return (
-    <div className="max-w-3xl mx-auto p-6 space-y-6">
+    <div className=" mx-auto w-full lg:w-2/3 p-6 space-y-6">
       <div className="stats flex justify-between mb-4 text-lg text-white">
-        <div>WPM: {stats.wpm}</div>
-        <div>Accuracy: {stats.accuracy}%</div>
-        <div>Errors: {currentErrors}</div>
+      <div>WPM: <b>{stats.wpm}</b></div>
+        <div>Accuracy: <b>{stats.accuracy}%</b></div>
+        <div>Errors: <b>{currentErrors}</b></div>
       </div>
+      <div className="flex items-center gap-3 p-4 rounded-lg bg-gray-800/90 backdrop-blur-sm shadow-lg">
+  <div className="flex items-center justify-between gap-3 w-full">
+    <Select value={currentTheme} onValueChange={handleThemeChange}>
+      <SelectTrigger className="w-40 bg-gray-700 border-gray-600 rounded-md text-white hover:bg-gray-600 transition-colors">
+        <div className="flex items-center">
+          <SelectValue placeholder="Select theme" />
+        </div>
+      </SelectTrigger>
+      <SelectContent className="bg-gray-700 border-gray-600 text-white rounded-md">
+        {Object.keys(themes).map((theme) => (
+          <SelectItem 
+            key={theme} 
+            value={theme} 
+            className="hover:bg-gray-600 focus:bg-gray-600"
+          >
+            <div className="flex items-center">
+              <div 
+                className="w-3 h-3 rounded-full mr-2" 
+                style={{ backgroundColor: themes[theme as ThemeKey].primary || '#fff' }}
+              />
+              {theme.charAt(0).toUpperCase() + theme.slice(1)}
+            </div>
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
+         <Select value={fontSize} onValueChange={handleFontSizeChange}>
+              <SelectTrigger className="w-32 bg-gray-700 border-gray-600 rounded-md text-white hover:bg-gray-600 transition-colors">
+                <div className="flex items-center">
+                  <span className="text-gray-400 mr-2">Aa</span>
+                  <SelectValue placeholder="Size" />
+                </div>
+              </SelectTrigger>
+              <SelectContent className="bg-gray-700 border-gray-600 text-white rounded-md">
+                <SelectItem value="text-sm" className="hover:bg-gray-600 focus:bg-gray-600">Small</SelectItem>
+                <SelectItem value="text-lg" className="hover:bg-gray-600 focus:bg-gray-600">Medium</SelectItem>
+                <SelectItem value="text-xl" className="hover:bg-gray-600 focus:bg-gray-600">Large</SelectItem>
+                <SelectItem value="text-2xl" className="hover:bg-gray-600 focus:bg-gray-600">X-Large</SelectItem>
+              </SelectContent>
+            </Select>
 
-      <div
-        ref={textAreaRef}
-        tabIndex={0}
-        onKeyDown={counter > 0 ? undefined : handleKeyDown  }
-        className={`text-area p-4 bg-gray-900 rounded-lg font-mono text-lg leading-relaxed whitespace-pre-wrap focus:outline-none focus:ring-2 min-h-[200px] cursor-text`}
-      >
-        {renderText()}
-        <span className="animate-pulse">|</span>
+  <Button 
+    onClick={() => {setIsSoundEnabled(!isSoundEnabled)}}
+    className="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-md transition-colors flex items-center gap-2"
+  >
+    {isSoundEnabled ? (
+      <>
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <path d="M11 5L6 9H2v6h4l5 4V5z" />
+          <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
+          <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
+        </svg>
+        Mute
+      </>
+    ) : (
+      <>
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <path d="M11 5L6 9H2v6h4l5 4V5z" />
+          <line x1="23" y1="9" x2="17" y2="15" />
+          <line x1="17" y1="9" x2="23" y2="15" />
+        </svg>
+        Unmute
+      </>
+    )}
+  </Button>
+</div>
+</div>
+      {/* Typing Area */}
+            <div
+              ref={textAreaRef}
+              tabIndex={0}
+              onKeyDown={counter > 0 ? undefined : handleKeyDown}
+              className={`px-6 p-3 rounded-lg font-mono ${fontSize} leading-relaxed 
+                whitespace-pre-wrap focus:outline-none focus:ring-1 focus:ring-[${themes[currentTheme].primary}] min-h-[180px]
+                 duration-200 ${themes[currentTheme].className}`}
+            >
+              {renderText()}
       </div>
       <AlertDialog open={isCompleted}>
         <AlertDialogContent className="bg-gray-800 text-white border-none ">

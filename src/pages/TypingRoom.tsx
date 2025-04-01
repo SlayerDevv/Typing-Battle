@@ -217,36 +217,33 @@ export default function TypingRoom() {
   }
 
   return (
-    <div className="min-h-screen bg-[url('/bg.jpg')] bg-cover bg-center ">
-      <Card className={`w-full h-screen bg-purple-400 px-7 rounded-md bg-clip-padding backdrop-filter backdrop-blur-md bg-opacity-10 border-none`}>
+    <div className="min-h-screen bg-[url('/bg.jpg')] bg-cover bg-center  ">
+      <Card className={`w-full h-screen bg-black px-7 rounded-md bg-clip-padding backdrop-filter backdrop-blur-sm bg-opacity-20 border-none`}>
         {opponentStats && <OpponentStats {...opponentStats} />}
         
         <CardHeader className="space-y-8">
-        <CardTitle className="text-white text-6xl text-center font-bold tracking-wide bg-clip-text">
-           Room: {roomId} 
+        <CardTitle className="text-white text-4xl text-center font-bold tracking-wide bg-clip-text">
+           Room: "{roomId}"
           </CardTitle>
         </CardHeader>
 
-        <CardContent className="space-y-12">
+        <CardContent className="">
           <div className="text-white">
             <TimerDisplay counter={preparationTime} status={RoomData?.status} />
             
             <div className="text-center space-y-8 mb-12">
-            <h2 className="text-4xl font-bold text-white bg-clip-text">
+            <h2 className="text-2xl font-bold text-white bg-clip-text">
                {RoomData.status === 'waiting' && '⏳'}
                 {RoomData.status === 'running' && '🏃'}
                 {RoomData.status.toUpperCase()}
               </h2>
-              
-              <h3 className="text-4xl font-bold text-white bg-clip-text">
-                👥 Players 👥
-              </h3>
+
             </div>
 
-            <div className="flex items-center justify-center gap-8 mb-12">
+            <div className="flex items-center justify-center gap-8 mb-6">
               {RoomData.players.map((player, index) => (
                 <React.Fragment key={player.id}>
-                  <div className={`p-6 rounded-xl w-72 backdrop-blur-lg transform transition-all duration-300 
+                  <div className={`p-3 rounded-xl w-72 backdrop-blur-lg transform transition-all duration-300 
                     ${player.id === playerId 
                       ? "bg-white/10 border-2 border-green-400/20" 
                       : "bg-white/10 border-2 border-white/20"}`}>
@@ -275,7 +272,7 @@ export default function TypingRoom() {
                     </div>
                   </div>
                   {index === 0 && RoomData.players.length > 1 && (
-                    <div className="text-5xl font-bold bg-gradient-to-r from-white to-white text-transparent bg-clip-text animate-pulse">
+                    <div className="text-4xl font-bold bg-gradient-to-r from-white to-white text-transparent bg-clip-text animate-pulse">
                       VS
                     </div>
                   )}
@@ -285,7 +282,7 @@ export default function TypingRoom() {
           </div>
 
           {RoomData.ready.length >= 2 ? (
-            <div className="transform transition-all duration-500 hover:scale-[1.02]">
+            <div className="transform transition-all duration-500 ">
               <TypingCmp
                 socket={socket}
                 roomId={roomId!}

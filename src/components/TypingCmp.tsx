@@ -19,7 +19,14 @@ interface TypingCmpProps {
   
 }
 import { Socket } from "socket.io-client";
-import { themes } from '@/config/themes';
+const themes = {
+  serika: { className: "bg-[#323437] text-[#e2b714]", primary: "#e2b714" },
+  dracula: { className: "bg-[#282a36] text-[#bd93f9]", primary: "#bd93f9" },
+  nord: { className: "bg-[#242933] text-[#88c0d0]", primary: "#88c0d0" },
+  coral: { className: "bg-[#1e1e1e] text-[#ff9a8b]", primary: "#ff9a8b" },
+  matrix: { className: "bg-[#0d0208] text-[#00ff41]", primary: "#00ff41" },
+  minimal: { className: "bg-gray-800 text-[#e0e0e0]", primary: "#e0e0e0" },
+}
 type ThemeKey = keyof typeof themes;
 
 const TypingCmp: React.FC<TypingCmpProps> = ({ socket, roomId, playerId, counter,sampleText }) => {
@@ -379,7 +386,7 @@ const TypingCmp: React.FC<TypingCmpProps> = ({ socket, roomId, playerId, counter
         tabIndex={0}
         onKeyDown={counter > 0 ? undefined : handleKeyDown}
         className={`px-6 p-3 rounded-lg font-mono ${fontSize} leading-relaxed 
-                whitespace-pre-wrap focus:outline-none focus:ring-1 focus:ring-[${themes[currentTheme].primary}] min-h-[180px]
+                whitespace-pre-wrap focus:outline-none focus:ring-1 min-h-[180px]
                  duration-200 ${themes[currentTheme].className}`}
       >
         {renderText()}
